@@ -101,39 +101,48 @@
 
     /* =====================
        HERO LAYOUT
-       3 containers lado a lado:
-       [texto] [player] [gifs]
+       Container master centraliza tudo.
+       Dentro dele: [texto] [player] [gifs]
+       O master cresce até preencher o espaço.
        ===================== */
 
     .hero {
       height: 100vh;
       min-height: 560px;
       display: flex;
-      flex-direction: row;
       align-items: center;
-      gap: 24px;
+      justify-content: center;
       padding: 80px 40px 60px;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
     }
 
-    /* --- Container 1: Texto --- */
+    /* Master container: ocupa todo espaço disponível */
+    .hero-master {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 20px;
+      width: 100%;
+      height: 100%;
+      max-height: calc(100vh - 140px);
+    }
+
+    /* --- Container 1: Texto ---
+       Largura fixa, altura = altura do master */
     .hero-content {
-      /* ocupa o espaço que sobrar depois do player e gifs */
-      flex: 1;
-      min-width: 200px;
-      max-width: 320px;
+      width: 240px;
+      flex-shrink: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-self: center;
       position: relative;
       z-index: 1;
     }
     .hero h1 {
       font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(40px, 4.2vw, 88px);
+      font-size: clamp(36px, 3.2vw, 80px);
       line-height: 0.92;
       letter-spacing: 0.02em;
       color: var(--text);
@@ -141,23 +150,31 @@
       animation: fadeUp 0.8s 0.4s forwards;
     }
 
-    /* --- Container 2: Player principal --- */
+    /* --- Container 2: Player ---
+       Ocupa o espaço restante.
+       Altura = altura do master.
+       Largura máxima definida pelo aspect-ratio. */
     .hero-player {
-      /* largura máxima fixa; altura vem do aspect-ratio */
-      flex-shrink: 0;
-      width: min(55vw, 760px);
+      flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      align-self: center;
+      justify-content: center;
       position: relative;
       z-index: 1;
     }
-    .hero-player-inner { width: 100%; }
-    .hero-player-wrapper {
+    .hero-player-inner {
+      /* Caixa que respeita 16:9 dentro da altura disponível */
       width: 100%;
-      aspect-ratio: 16 / 9;
+      height: 0;
+      padding-bottom: 56.25%;
       position: relative;
       background: var(--bg3);
+      overflow: hidden;
+    }
+    .hero-player-wrapper {
+      position: absolute;
+      inset: 0;
       overflow: hidden;
     }
     .hero-player-wrapper iframe {
@@ -180,25 +197,21 @@
     .hero-player-label span { color: var(--gold); }
 
     /* --- Container 3: GIFs ---
-       Altura = mesma do player (via JS).
-       Os 3 GIFs dividem essa altura com space-between,
-       então o espaçamento se ajusta automaticamente.
-       Cada GIF mantém proporção 16:9.
-    */
+       Largura fixa.
+       Altura = altura do master (stretch).
+       space-between distribui os gaps automaticamente.
+       Cada GIF: largura 100%, aspect-ratio 16:9. */
     .hero-thumbs {
+      width: 160px;
       flex-shrink: 0;
-      width: 150px;
-      /* altura será setada por JS para igualar o player */
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      align-self: center;
       position: relative;
       z-index: 1;
     }
     .hero-thumb {
-      width: 150px;
-      /* altura = 150 * 9/16 = ~84px, mas pode crescer */
+      width: 100%;
       aspect-ratio: 16 / 9;
       position: relative;
       overflow: hidden;
@@ -657,21 +670,25 @@
     @media (max-width: 900px) {
       nav { padding: 20px 24px; }
       nav.scrolled { padding: 14px 24px; }
-      .hero {
-        grid-template-columns: 1fr;
-        padding: 100px 24px 60px;
-        gap: 32px;
+      .hero { padding: 80px 16px 40px; }
+      .hero-master {
+        flex-direction: column;
+        height: auto !important;
+        gap: 16px;
       }
+      .hero-content { width: 100%; }
+      .hero-player { width: 100%; }
       .hero-thumbs {
+        width: 100%;
         flex-direction: row;
-        height: auto;
-        overflow-x: auto;
+        height: auto !important;
         gap: 8px;
-        padding-bottom: 4px;
       }
       .hero-thumb {
-        min-width: 120px;
-        flex-shrink: 0;
+        flex: 1;
+        width: auto;
+        min-width: 0;
+        aspect-ratio: 16/9;
       }
       .reel-section, .projects-section, .about-section, .contact-section { padding-left: 24px; padding-right: 24px; }
       .projects-grid { grid-template-columns: 1fr; }
@@ -704,6 +721,9 @@
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-noise"></div>
+
+    <!-- Master container -->
+    <div class="hero-master">
 
     <!-- Col 1: text -->
     <div class="hero-content">
@@ -779,6 +799,8 @@
       </div>
 
     </div>
+
+    </div><!-- /hero-master -->
 
     <div class="scroll-indicator">
       <div class="scroll-line"></div>
@@ -994,20 +1016,23 @@
       });
     });
 
-    // Match thumbs container height to player height
-    // so space-between distributes gaps automatically
-    function syncThumbs() {
-      const wrapper = document.querySelector('.hero-player-wrapper');
-      const thumbsEl = document.querySelector('.hero-thumbs');
-      if (!wrapper || !thumbsEl) return;
-      const h = wrapper.getBoundingClientRect().height;
-      if (h > 0) thumbsEl.style.height = h + 'px';
+    // Hero master height sync: constrain to 16:9 player height
+    function syncHero() {
+      const master = document.querySelector('.hero-master');
+      const playerInner = document.querySelector('.hero-player-inner');
+      if (!master || !playerInner) return;
+      // Get available width of player col
+      const playerCol = document.querySelector('.hero-player');
+      if (!playerCol) return;
+      const availW = playerCol.offsetWidth;
+      const playerH = availW * 9 / 16;
+      const masterH = Math.min(playerH, window.innerHeight - 140);
+      master.style.height = masterH + 'px';
     }
-    window.addEventListener('load', syncThumbs);
-    window.addEventListener('resize', syncThumbs);
-    // Run after Vimeo iframe settles
-    setTimeout(syncThumbs, 100);
-    setTimeout(syncThumbs, 500);
+    window.addEventListener('load', syncHero);
+    window.addEventListener('resize', syncHero);
+    setTimeout(syncHero, 100);
+    setTimeout(syncHero, 500);
   </script>
 </body>
 </html>

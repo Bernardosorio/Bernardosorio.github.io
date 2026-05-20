@@ -101,9 +101,8 @@
 
     /* =====================
        HERO LAYOUT
-       Container master centraliza tudo.
-       Dentro dele: [texto] [player] [gifs]
-       O master cresce até preencher o espaço.
+       Master centraliza os 3 containers.
+       Player tem tamanho fixo e equilibrado.
        ===================== */
 
     .hero {
@@ -112,37 +111,35 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 80px 40px 60px;
+      padding: 80px 48px 60px;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
     }
 
-    /* Master container: ocupa todo espaço disponível */
+    /* Master: largura total, altura fixa e equilibrada */
     .hero-master {
       display: flex;
       flex-direction: row;
-      align-items: stretch;
-      gap: 20px;
+      align-items: flex-start;
+      gap: 24px;
       width: 100%;
-      height: 100%;
-      max-height: calc(100vh - 140px);
     }
 
-    /* --- Container 1: Texto ---
-       Largura fixa, altura = altura do master */
+    /* --- Container 1: Texto --- */
     .hero-content {
-      width: 240px;
-      flex-shrink: 0;
+      flex: 1;
+      min-width: 200px;
+      max-width: 300px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       position: relative;
       z-index: 1;
     }
     .hero h1 {
       font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(36px, 3.2vw, 80px);
+      font-size: clamp(40px, 3.6vw, 76px);
       line-height: 0.92;
       letter-spacing: 0.02em;
       color: var(--text);
@@ -151,30 +148,22 @@
     }
 
     /* --- Container 2: Player ---
-       Ocupa o espaço restante.
-       Altura = altura do master.
-       Largura máxima definida pelo aspect-ratio. */
+       Largura máxima de 600px — player equilibrado,
+       não domina a tela. Altura vem do aspect-ratio. */
     .hero-player {
-      flex: 1;
-      min-width: 0;
+      flex-shrink: 0;
+      width: clamp(360px, 44vw, 600px);
       display: flex;
       flex-direction: column;
-      justify-content: center;
       position: relative;
       z-index: 1;
     }
-    .hero-player-inner {
-      /* Caixa que respeita 16:9 dentro da altura disponível */
+    .hero-player-inner { width: 100%; }
+    .hero-player-wrapper {
       width: 100%;
-      height: 0;
-      padding-bottom: 56.25%;
+      aspect-ratio: 16 / 9;
       position: relative;
       background: var(--bg3);
-      overflow: hidden;
-    }
-    .hero-player-wrapper {
-      position: absolute;
-      inset: 0;
       overflow: hidden;
     }
     .hero-player-wrapper iframe {
@@ -197,21 +186,19 @@
     .hero-player-label span { color: var(--gold); }
 
     /* --- Container 3: GIFs ---
-       Largura fixa.
-       Altura = altura do master (stretch).
-       space-between distribui os gaps automaticamente.
-       Cada GIF: largura 100%, aspect-ratio 16:9. */
+       Alinhados pelo topo, gap fixo, 16:9. */
     .hero-thumbs {
-      width: 160px;
       flex-shrink: 0;
+      width: 140px;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: flex-start;
+      gap: 10px;
       position: relative;
       z-index: 1;
     }
     .hero-thumb {
-      width: 100%;
+      width: 140px;
       aspect-ratio: 16 / 9;
       position: relative;
       overflow: hidden;
@@ -1016,23 +1003,7 @@
       });
     });
 
-    // Hero master height sync: constrain to 16:9 player height
-    function syncHero() {
-      const master = document.querySelector('.hero-master');
-      const playerInner = document.querySelector('.hero-player-inner');
-      if (!master || !playerInner) return;
-      // Get available width of player col
-      const playerCol = document.querySelector('.hero-player');
-      if (!playerCol) return;
-      const availW = playerCol.offsetWidth;
-      const playerH = availW * 9 / 16;
-      const masterH = Math.min(playerH, window.innerHeight - 140);
-      master.style.height = masterH + 'px';
-    }
-    window.addEventListener('load', syncHero);
-    window.addEventListener('resize', syncHero);
-    setTimeout(syncHero, 100);
-    setTimeout(syncHero, 500);
+
   </script>
 </body>
 </html>

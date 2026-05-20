@@ -152,11 +152,6 @@
     .hero h1 em {
       font-style: normal;
       color: var(--gold);
-      -webkit-text-stroke: 0px;
-    }
-    .hero h1 .outline {
-      -webkit-text-stroke: 1px rgba(240,192,64,0.4);
-      color: transparent;
     }
     .hero-sub {
       margin-top: 32px;
@@ -249,7 +244,9 @@
     .reel-wrapper {
       position: relative;
       width: 100%;
-      padding-bottom: 56.25%;
+      max-width: 1920px;
+      margin: 0 auto;
+      padding-bottom: min(56.25%, 1080px);
       background: var(--bg3);
       overflow: hidden;
     }
@@ -569,7 +566,7 @@
     <p class="hero-tag">Motion Designer & Editor de Vídeo</p>
     <h1>
       BERNARDO<br>
-      <em>RODRI</em><span class="outline">GUES</span>
+      <em>RODRIGUES</em>
     </h1>
     <p class="hero-sub">
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Movimento, ritmo e narrativa — transformando ideias em experiências visuais que ficam na memória.
@@ -591,7 +588,7 @@
   <!-- SHOWREEL -->
   <section class="reel-section" id="reel">
     <p class="section-label reveal">Showreel</p>
-    <h2 class="section-title reveal reveal-delay-1">MOTION REEL<br><span style="color:var(--gold)">2024</span></h2>
+    <h2 class="section-title reveal reveal-delay-1">MOTION REEL</h2>
     <div class="reel-wrapper reveal reveal-delay-2">
       <iframe
         src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=F0C040"

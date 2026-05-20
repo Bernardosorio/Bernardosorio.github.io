@@ -101,12 +101,14 @@
 
     /* HERO */
     .hero {
-      min-height: 100vh;
+      height: 100vh;
+      min-height: 600px;
       display: grid;
-      grid-template-columns: 340px 1fr 140px;
+      grid-template-columns: 320px 1fr 160px;
+      grid-template-rows: 1fr;
       align-items: center;
-      gap: 24px;
-      padding: 100px 48px 80px;
+      gap: 20px;
+      padding: 90px 48px 60px;
       position: relative;
       overflow: hidden;
     }
@@ -115,15 +117,23 @@
       flex-direction: column;
       position: relative;
       z-index: 1;
+      height: 100%;
+      justify-content: center;
     }
     .hero-player {
       position: relative;
       z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
     }
     .hero-player-wrapper {
       position: relative;
       width: 100%;
-      padding-bottom: 56.25%;
+      /* height driven by aspect-ratio, capped so it never overflows */
+      aspect-ratio: 16/9;
+      max-height: calc(100vh - 200px);
       background: var(--bg3);
       overflow: hidden;
     }
@@ -143,6 +153,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
     .hero-player-label span { color: var(--gold); }
 
@@ -153,16 +164,17 @@
       gap: 10px;
       position: relative;
       z-index: 1;
-      height: 100%;
       justify-content: center;
+      align-self: center;
+      width: 160px;
     }
     .hero-thumb {
       position: relative;
-      width: 100%;
+      width: 160px;
       aspect-ratio: 16/9;
       overflow: hidden;
       cursor: none;
-      border: 1px solid transparent;
+      border: 1px solid rgba(255,255,255,0.08);
       transition: border-color 0.25s, transform 0.25s;
       flex-shrink: 0;
     }
@@ -174,7 +186,7 @@
       transition: transform 0.4s ease;
     }
     .hero-thumb:hover img { transform: scale(1.06); }
-    .hero-thumb:hover { border-color: var(--gold); transform: translateX(-3px); }
+    .hero-thumb:hover { border-color: var(--gold); transform: translateX(-4px); }
     .hero-thumb.active { border-color: var(--gold); }
     .hero-thumb.active::before {
       content: '';
@@ -187,7 +199,7 @@
     .hero-thumb-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.25);
+      background: rgba(0,0,0,0.3);
       display: flex;
       align-items: center;
       justify-content: center;

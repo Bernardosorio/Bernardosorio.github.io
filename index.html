@@ -103,10 +103,10 @@
     .hero {
       min-height: 100vh;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 340px 1fr 140px;
       align-items: center;
-      gap: 60px;
-      padding: 100px 60px 80px;
+      gap: 24px;
+      padding: 100px 48px 80px;
       position: relative;
       overflow: hidden;
     }
@@ -116,33 +116,94 @@
       position: relative;
       z-index: 1;
     }
-    .hero-reel {
+    .hero-player {
       position: relative;
       z-index: 1;
     }
-    .hero-reel-wrapper {
+    .hero-player-wrapper {
       position: relative;
       width: 100%;
       padding-bottom: 56.25%;
       background: var(--bg3);
       overflow: hidden;
-      border: 1px solid var(--border);
     }
-    .hero-reel-wrapper iframe {
+    .hero-player-wrapper iframe {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       border: none;
     }
-    .hero-reel-label {
+    .hero-player-label {
       font-size: 10px;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--muted);
       margin-top: 10px;
-      text-align: right;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
+    .hero-player-label span { color: var(--gold); }
+
+    /* Thumbnail sidebar */
+    .hero-thumbs {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      justify-content: center;
+    }
+    .hero-thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      cursor: none;
+      border: 1px solid transparent;
+      transition: border-color 0.25s, transform 0.25s;
+      flex-shrink: 0;
+    }
+    .hero-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+    .hero-thumb:hover img { transform: scale(1.06); }
+    .hero-thumb:hover { border-color: var(--gold); transform: translateX(-3px); }
+    .hero-thumb.active { border-color: var(--gold); }
+    .hero-thumb.active::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      z-index: 2;
+    }
+    .hero-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .hero-thumb:hover .hero-thumb-overlay { opacity: 1; }
+    .hero-thumb-play {
+      width: 28px; height: 28px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-thumb-play svg { margin-left: 2px; }
     .hero-bg {
       position: absolute;
       inset: 0;
@@ -566,7 +627,18 @@
       .hero {
         grid-template-columns: 1fr;
         padding: 100px 24px 60px;
-        gap: 40px;
+        gap: 32px;
+      }
+      .hero-thumbs {
+        flex-direction: row;
+        height: auto;
+        overflow-x: auto;
+        gap: 8px;
+        padding-bottom: 4px;
+      }
+      .hero-thumb {
+        min-width: 120px;
+        flex-shrink: 0;
       }
       .reel-section, .projects-section, .about-section, .contact-section { padding-left: 24px; padding-right: 24px; }
       .projects-grid { grid-template-columns: 1fr; }
@@ -600,9 +672,9 @@
     <div class="hero-bg"></div>
     <div class="hero-noise"></div>
 
-    <!-- Left: text content -->
+    <!-- Col 1: text -->
     <div class="hero-content">
-      <p class="hero-tag">Motion Designer & Editor de Vídeo</p>
+      <p class="hero-tag">Motion Designer &amp; Editor de Vídeo</p>
       <h1>
         BERNARDO<br>
         <em>RODRIGUES</em>
@@ -619,17 +691,58 @@
       </div>
     </div>
 
-    <!-- Right: reel -->
-    <div class="hero-reel">
-      <div class="hero-reel-wrapper">
+    <!-- Col 2: main player -->
+    <div class="hero-player">
+      <div class="hero-player-wrapper">
         <iframe
+          id="heroIframe"
           src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=F0C040"
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
-          title="Motion Reel — Bernardo Rodrigues"
         ></iframe>
       </div>
-      <p class="hero-reel-label">Motion Reel — Bernardo Rodrigues</p>
+      <div class="hero-player-label">
+        <span id="heroLabel">Motion Reel</span>
+        <span>Bernardo Rodrigues</span>
+      </div>
+    </div>
+
+    <!-- Col 3: thumbnails -->
+    <div class="hero-thumbs">
+
+      <div class="hero-thumb active"
+           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+           data-label="Motion Reel">
+        <img src="MTC-CAPA.gif" alt="Motion Reel" />
+        <div class="hero-thumb-overlay">
+          <div class="hero-thumb-play">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-thumb"
+           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+           data-label="New Normal">
+        <img src="new-normal-capa.gif" alt="New Normal" />
+        <div class="hero-thumb-overlay">
+          <div class="hero-thumb-play">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-thumb"
+           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+           data-label="Zappo Delivery">
+        <img src="Zappo-CAPA.gif" alt="Zappo Delivery" />
+        <div class="hero-thumb-overlay">
+          <div class="hero-thumb-play">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="scroll-indicator">
@@ -832,6 +945,19 @@
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
     }, { threshold: 0.1 });
     reveals.forEach(el => observer.observe(el));
+
+    // Thumbnail carousel
+    const thumbs = document.querySelectorAll('.hero-thumb');
+    const iframe = document.getElementById('heroIframe');
+    const label = document.getElementById('heroLabel');
+    thumbs.forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        thumbs.forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+        iframe.src = thumb.dataset.src;
+        label.textContent = thumb.dataset.label;
+      });
+    });
   </script>
 </body>
 </html>

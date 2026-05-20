@@ -100,56 +100,59 @@
     .nav-links a:hover { color: var(--gold); }
 
     /* HERO */
-    :root {
-      --thumb-w: 160px;
-      --thumb-h: calc(var(--thumb-w) * 9 / 16);
-      --player-max-h: min(calc(100vh - 180px), 540px);
-      --player-w: calc(var(--player-max-h) * 16 / 9);
-    }
     .hero {
       height: 100vh;
       min-height: 560px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
+      display: grid;
+      /* text col fixed, player+thumbs fill rest */
+      grid-template-columns: 280px 1fr auto;
+      grid-template-rows: 1fr;
+      gap: 24px;
       padding: 80px 40px 60px;
       position: relative;
       overflow: hidden;
     }
-    /* Text col: fills remaining space */
     .hero-content {
-      flex: 1;
-      min-width: 0;
-      max-width: 320px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      align-self: flex-start;
-      margin-top: calc((100vh - var(--player-max-h)) / 2 - 80px + 4px);
+      justify-content: center;
       position: relative;
       z-index: 1;
+      min-width: 0;
     }
     .hero h1 {
       font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(36px, 4vw, 80px);
+      font-size: clamp(40px, 4.5vw, 90px);
       line-height: 0.92;
       letter-spacing: 0.02em;
       color: var(--text);
       opacity: 0;
       animation: fadeUp 0.8s 0.4s forwards;
     }
-    /* Player col: fixed size, never grows */
+    /* Player: fills available height, width from aspect ratio */
     .hero-player {
-      flex-shrink: 0;
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      align-items: stretch;
       position: relative;
       z-index: 1;
+      min-width: 0;
+      height: 100%;
+    }
+    .hero-player-inner {
+      /* grow to fill column, but respect 16:9 */
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .hero-player-wrapper {
-      width: var(--player-w);
-      height: var(--player-max-h);
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      /* never taller than available space */
+      max-height: calc(100vh - 160px);
       position: relative;
       background: var(--bg3);
       overflow: hidden;
@@ -170,26 +173,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
+      flex-shrink: 0;
     }
     .hero-player-label span { color: var(--gold); }
 
-    /* Thumbnail sidebar */
+    /* Thumbnails: match player height exactly via JS */
     .hero-thumbs {
-      flex-shrink: 0;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      width: var(--thumb-w);
-      height: var(--player-max-h);
-      justify-content: flex-start;
+      justify-content: center;
+      gap: 8px;
       position: relative;
       z-index: 1;
+      width: 160px;
+      flex-shrink: 0;
     }
     .hero-thumb {
       flex-shrink: 0;
-      width: var(--thumb-w);
-      height: var(--thumb-h);
+      width: 160px;
+      height: 90px; /* 16:9 of 160px */
       position: relative;
       overflow: hidden;
       cursor: none;
@@ -715,6 +717,7 @@
 
     <!-- Col 2: main player -->
     <div class="hero-player">
+      <div class="hero-player-inner">
       <div class="hero-player-wrapper">
         <iframe
           id="heroIframe"
@@ -722,6 +725,7 @@
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen
         ></iframe>
+      </div>
       </div>
       <div class="hero-player-label">
         <span id="heroLabel">Motion Reel</span>
@@ -980,6 +984,25 @@
         label.textContent = thumb.dataset.label;
       });
     });
+
+    // Sync thumb size and position to player
+    function syncThumbs() {
+      const wrapper = document.querySelector('.hero-player-wrapper');
+      const thumbsEl = document.querySelector('.hero-thumbs');
+      const thumbEls = document.querySelectorAll('.hero-thumb');
+      if (!wrapper || !thumbsEl) return;
+      const rect = wrapper.getBoundingClientRect();
+      const playerH = rect.height;
+      const playerTop = rect.top;
+      // Each thumb is 16:9 at 160px wide = 90px tall, 3 thumbs + 2 gaps of 8px
+      const thumbH = 90;
+      const totalH = thumbH * 3 + 8 * 2;
+      // Align thumbs block to player top
+      thumbsEl.style.marginTop = (playerTop - thumbsEl.getBoundingClientRect().top + (playerH - totalH) / 2) + 'px';
+    }
+    window.addEventListener('load', syncThumbs);
+    window.addEventListener('resize', syncThumbs);
+    setTimeout(syncThumbs, 300);
   </script>
 </body>
 </html>

@@ -6,23 +6,18 @@
   <title>Bernardo Rodrigues — Motion Designer & Editor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
   <style>
     :root {
       --gold: #F0C040;
-      --gold-dim: #c9a030;
       --bg: #0a0a0c;
-      --bg2: #111115;
       --bg3: #18181e;
       --text: #e8e4dc;
       --muted: #666;
       --border: rgba(240,192,64,0.15);
     }
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
-
     body {
       background: var(--bg);
       color: var(--text);
@@ -32,696 +27,269 @@
       cursor: none;
     }
 
-    /* Custom cursor */
-    .cursor {
-      position: fixed;
-      width: 10px; height: 10px;
-      background: var(--gold);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
-      mix-blend-mode: difference;
-    }
-    .cursor-ring {
-      position: fixed;
-      width: 36px; height: 36px;
-      border: 1px solid rgba(240,192,64,0.5);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.12s ease, width 0.25s ease, height 0.25s ease, opacity 0.2s ease;
-    }
-    body:hover .cursor { opacity: 1; }
-    a:hover ~ .cursor, button:hover ~ .cursor { width: 20px; height: 20px; }
+    /* Cursor */
+    .cursor { position: fixed; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .2s, height .2s; mix-blend-mode: difference; }
+    .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(240,192,64,.5); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: width .25s, height .25s; }
 
     /* NAV */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 60px;
-      background: linear-gradient(to bottom, rgba(10,10,12,0.95) 0%, transparent 100%);
-      backdrop-filter: blur(0px);
-      transition: backdrop-filter 0.3s, padding 0.3s;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 48px;
+      background: linear-gradient(to bottom, rgba(10,10,12,.95) 0%, transparent 100%);
+      transition: backdrop-filter .3s, background .3s;
     }
-    nav.scrolled {
-      backdrop-filter: blur(20px);
-      background: rgba(10,10,12,0.92);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 1600px;
-      padding: 28px 0;
-      transition: padding 0.3s;
-    }
-    nav.scrolled .nav-inner {
-      padding: 18px 0;
-    }
-    .logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 0.15em;
-      color: var(--text);
-      text-decoration: none;
-    }
+    nav.scrolled { backdrop-filter: blur(20px); background: rgba(10,10,12,.92); border-bottom: 1px solid var(--border); }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; padding: 24px 0; transition: padding .3s; }
+    nav.scrolled .nav-inner { padding: 16px 0; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: .15em; color: var(--text); text-decoration: none; }
     .logo span { color: var(--gold); }
-    .nav-links {
-      display: flex;
-      gap: 40px;
-      list-style: none;
-    }
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; transition: color .2s; }
     .nav-links a:hover { color: var(--gold); }
 
-    /* =====================
-       HERO LAYOUT
-       Master centraliza os 3 containers.
-       Player tem tamanho fixo e equilibrado.
-       ===================== */
-
+    /* ===== HERO =====
+       Estratégia: JS calcula a altura disponível (vh - nav),
+       define --hero-h como variável CSS.
+       Player ocupa --hero-h * 16/9 de largura.
+       Thumbs: altura = --hero-h, cada thumb = (h - 3*gap) / 4.
+       Texto: largura fixa 220px, fonte escala com --hero-h.
+    */
     .hero {
       height: 100vh;
-      min-height: 560px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 80px 60px 60px;
+      padding: 0 48px;
       position: relative;
       overflow: hidden;
-      box-sizing: border-box;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 50% 60% at 60% 50%, rgba(240,192,64,.06) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    /* Master: largura máxima de 1600px, centralizado.
-       Em 21:9 as laterais ficam vazias — intencional. */
+    /* Master: max 1400px, flex row */
     .hero-master {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
-      justify-content: flex-start;
-      gap: 1.5vw;
-      width: 100%;
-      max-width: 1280px;
-      padding-top: calc((100vh - 140px - (62vw * 9 / 16)) / 2);
-    }
-
-    /* --- Container 1: Texto --- */
-    .hero-content {
-      flex-shrink: 0;
-      width: 16vw;
-      min-width: 180px;
-      max-width: 260px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      position: relative;
-      z-index: 1;
-    }
-    .hero h1 {
-      font-family: "Bebas Neue", sans-serif;
-      font-size: min(3.6vw, 68px);
-      line-height: 0.92;
-      letter-spacing: 0.02em;
-      color: var(--text);
-      opacity: 0;
-      animation: fadeUp 0.8s 0.4s forwards;
-    }
-
-    /* --- Container 2: Player: flex:1 ocupa o máximo disponível --- */
-    .hero-player {
-      flex: 1;
-      min-width: 0;
-      max-width: 1100px;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      z-index: 1;
-    }
-    .hero-player-inner { width: 100%; }
-    .hero-player-wrapper {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      position: relative;
-      background: var(--bg3);
-      overflow: hidden;
-    }
-    .hero-player-wrapper iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .hero-player-label {
-      font-size: 10px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .hero-player-label span { color: var(--gold); }
-
-    /* --- Container 3: GIFs ---
-       Thumb width calculado para que 4 thumbs + 3 gaps de 8px
-       = altura do player (flex:1 width * 9/16).
-       thumb_h = (player_h - 24px) / 4
-       thumb_w = thumb_h * 16/9
-       Como player usa flex:1, usamos vw como aproximação:
-       player_w ≈ 100vw - 240px - 24px - 24px - thumb_w
-       Simplificando: thumb_w fixo em 200px dá boa proporção */
-    .hero-thumbs {
-      flex-shrink: 0;
-      width: 13vw;
-      min-width: 130px;
-      max-width: 200px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      gap: 0.8vw;
-      position: relative;
-      z-index: 1;
-    }
-    .hero-thumb {
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      position: relative;
-      overflow: hidden;
-      cursor: none;
-      border: 1px solid rgba(255,255,255,0.08);
-      transition: border-color 0.25s, transform 0.25s;
-      flex-shrink: 0;
-    }
-    .hero-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      transition: transform 0.4s ease;
-    }
-    .hero-thumb:hover img { transform: scale(1.06); }
-    .hero-thumb:hover { border-color: var(--gold); transform: translateX(-4px); }
-    .hero-thumb.active { border-color: var(--gold); }
-    .hero-thumb.active::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--gold);
-      z-index: 2;
-    }
-    .hero-thumb-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.25s;
-    }
-    .hero-thumb:hover .hero-thumb-overlay { opacity: 1; }
-    .hero-thumb-play {
-      width: 28px; height: 28px;
-      background: var(--gold);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .hero-thumb-play svg { margin-left: 2px; }
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 70% 40%, rgba(240,192,64,0.07) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(240,192,64,0.04) 0%, transparent 60%);
-    }
-    .hero-noise {
-      position: absolute;
-      inset: 0;
-      opacity: 0.03;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      background-size: 200px;
-    }
-    .hero-line {
-      position: absolute;
-      top: 0; right: 200px;
-      width: 1px;
-      height: 100%;
-      background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent);
-    }
-
-    .hero-tag {
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 24px;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.2s forwards;
-    }
-    /* hero h1 defined in hero block above */
-    .hero h1 em {
-      font-style: normal;
-      color: var(--gold);
-    }
-    .hero-sub {
-      margin-top: 32px;
-      font-size: 15px;
-      color: var(--muted);
-      max-width: 420px;
-      line-height: 1.7;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.6s forwards;
-    }
-    .hero-cta {
-      margin-top: 48px;
-      display: flex;
       gap: 20px;
-      align-items: center;
-      opacity: 0;
-      animation: fadeUp 0.8s 0.8s forwards;
+      width: 100%;
+      max-width: 1400px;
+      /* JS seta --hero-h e posiciona verticalmente */
     }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--gold);
-      color: #0a0a0c;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 500;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      padding: 14px 28px;
-      transition: background 0.2s, transform 0.2s;
-    }
-    .btn-primary:hover { background: #fff; transform: translateY(-2px); }
-    .btn-secondary {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 12px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 2px;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .btn-secondary:hover { color: var(--gold); border-color: var(--gold); }
 
-    .scroll-indicator {
-      position: absolute;
-      right: 60px;
-      bottom: 80px;
+    /* Col 1: texto */
+    .hero-text {
+      flex-shrink: 0;
+      width: 220px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      opacity: 0;
-      animation: fadeIn 1s 1.2s forwards;
+      justify-content: flex-start;
+      padding-top: 2px;
     }
-    .scroll-indicator span {
+    .hero-eyebrow {
       font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      writing-mode: vertical-rl;
-    }
-    .scroll-line {
-      width: 1px;
-      height: 60px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-
-    /* SHOWREEL */
-    .reel-section {
-      padding: 120px 60px;
-      position: relative;
-    }
-    .section-label {
-      font-size: 10px;
-      letter-spacing: 0.3em;
+      letter-spacing: .25em;
       text-transform: uppercase;
       color: var(--gold);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+      opacity: 0;
+      animation: fadeUp .7s .1s forwards;
     }
-    .section-title {
+    .hero-name {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(40px, 6vw, 72px);
-      letter-spacing: 0.03em;
+      /* font-size set by JS based on available height */
+      line-height: .92;
+      letter-spacing: .02em;
       color: var(--text);
-      margin-bottom: 48px;
-    }
-    .reel-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 1920px;
-      margin: 0 auto;
-      padding-bottom: min(56.25%, 1080px);
-      background: var(--bg3);
-      overflow: hidden;
-    }
-    .reel-wrapper iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .reel-border {
-      position: absolute;
-      top: -2px; left: -2px; right: -2px; bottom: -2px;
-      border: 1px solid var(--border);
-      pointer-events: none;
-    }
-
-    /* PROJECTS */
-    .projects-section {
-      padding: 80px 60px 120px;
-    }
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2px;
-      margin-top: 48px;
-    }
-    .project-card {
-      position: relative;
-      aspect-ratio: 16/9;
-      background: var(--bg3);
-      overflow: hidden;
-      cursor: none;
-    }
-    .project-card-inner {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 24px;
-      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);
       opacity: 0;
-      transition: opacity 0.3s;
+      animation: fadeUp .7s .25s forwards;
     }
-    .project-card:hover .project-card-inner { opacity: 1; }
-    .project-thumb {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s ease;
-    }
-    .project-card:hover .project-thumb { transform: scale(1.05); }
-    .project-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg3);
-      transition: transform 0.5s ease;
-    }
-    .project-card:hover .project-placeholder { transform: scale(1.03); }
-    .project-placeholder-icon {
-      font-size: 32px;
-      opacity: 0.15;
-    }
-    .project-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px;
-      letter-spacing: 0.05em;
-      color: #fff;
-      position: relative;
-      z-index: 2;
-    }
-    .project-tag {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 2;
-    }
-    .project-card.featured {
-      grid-column: span 2;
-    }
-
-    /* ABOUT */
-    .about-section {
-      padding: 80px 60px 120px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 100px;
-      align-items: center;
-      border-top: 1px solid var(--border);
-    }
-    .about-left {}
-    .about-text {
-      font-size: 16px;
-      line-height: 1.9;
-      color: #aaa;
-      margin-top: 24px;
-    }
-    .about-text strong { color: var(--text); font-weight: 400; }
-    .about-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      margin-top: 48px;
-    }
-    .stat-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 56px;
-      color: var(--gold);
-      line-height: 1;
-    }
-    .stat-label {
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-    .about-right {
-      position: relative;
-    }
-    .about-card {
-      background: var(--bg3);
-      border: 1px solid var(--border);
-      padding: 40px;
-    }
-    .skills-list {
-      list-style: none;
-      margin-top: 24px;
-    }
-    .skills-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
+    .hero-name em { font-style: normal; color: var(--gold); }
+    .hero-desc {
       font-size: 13px;
       color: var(--muted);
-      letter-spacing: 0.05em;
-    }
-    .skills-list li:last-child { border-bottom: none; }
-    .skill-bar {
-      width: 80px;
-      height: 2px;
-      background: rgba(255,255,255,0.08);
-      position: relative;
-      overflow: hidden;
-    }
-    .skill-fill {
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      background: var(--gold);
-      transition: width 1s ease;
-    }
-
-    /* CONTACT */
-    .contact-section {
-      padding: 80px 60px 120px;
-      border-top: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 100px;
-      align-items: start;
-    }
-    .contact-left {}
-    .contact-big {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(48px, 6vw, 80px);
-      line-height: 0.95;
-      letter-spacing: 0.02em;
+      line-height: 1.7;
       margin-top: 16px;
+      opacity: 0;
+      animation: fadeUp .7s .4s forwards;
     }
-    .contact-big span { color: var(--gold); }
-    .contact-right {
-      padding-top: 60px;
-    }
-    .contact-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      margin-bottom: 36px;
-    }
-    .contact-item-label {
-      font-size: 10px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-    .contact-item-value {
-      font-size: 15px;
-      color: var(--text);
-      text-decoration: none;
-      transition: color 0.2s;
-      border-bottom: 1px solid transparent;
-      display: inline-block;
-    }
-    .contact-item-value:hover {
-      color: var(--gold);
-      border-color: var(--border);
-    }
-    .social-row {
+    .hero-actions {
+      margin-top: 24px;
       display: flex;
       gap: 16px;
-      margin-top: 48px;
-    }
-    .social-btn {
-      width: 44px; height: 44px;
-      border: 1px solid var(--border);
-      display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 16px;
-      transition: border-color 0.2s, color 0.2s, background 0.2s;
-    }
-    .social-btn:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: rgba(240,192,64,0.05);
-    }
-
-    /* FOOTER */
-    footer {
-      padding: 28px 60px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    footer p {
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-    }
-    footer a {
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    footer a:hover { color: var(--gold); }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes scrollPulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-
-    /* REVEAL ON SCROLL */
-    .reveal {
+      flex-wrap: wrap;
       opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
+      animation: fadeUp .7s .55s forwards;
     }
-    .reveal.visible {
-      opacity: 1;
-      transform: none;
+    .btn-gold {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold); color: #0a0a0c;
+      text-decoration: none; font-size: 11px; font-weight: 500;
+      letter-spacing: .15em; text-transform: uppercase;
+      padding: 12px 20px;
+      transition: background .2s, transform .2s; white-space: nowrap;
     }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
+    .btn-gold:hover { background: #fff; transform: translateY(-2px); }
+    .btn-ghost {
+      color: var(--muted); text-decoration: none; font-size: 11px;
+      letter-spacing: .1em; text-transform: uppercase;
+      border-bottom: 1px solid var(--border); padding-bottom: 2px;
+      transition: color .2s, border-color .2s; white-space: nowrap;
+    }
+    .btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
 
-    /* MOBILE */
-    @media (max-width: 900px) {
-      nav { padding: 20px 24px; }
-      nav.scrolled { padding: 14px 24px; }
-      .hero { padding: 80px 16px 40px; }
-      .hero-master {
-        flex-direction: column;
-        height: auto !important;
-        gap: 16px;
-      }
-      .hero-content { width: 100%; }
-      .hero-player { width: 100%; }
-      .hero-thumbs {
-        width: 100%;
-        flex-direction: row;
-        height: auto !important;
-        gap: 8px;
-      }
-      .hero-thumb {
-        flex: 1;
-        width: auto;
-        min-width: 0;
-        aspect-ratio: 16/9;
-      }
-      .reel-section, .projects-section, .about-section, .contact-section { padding-left: 24px; padding-right: 24px; }
+    /* Col 2: player — JS seta width e height */
+    .hero-player {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-player-box {
+      position: relative;
+      background: var(--bg3);
+      overflow: hidden;
+    }
+    .hero-player-box iframe {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; border: none;
+    }
+
+    /* Col 3: thumbs — JS seta width/height de cada thumb */
+    .hero-thumbs {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hero-thumb {
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+      border: 1px solid rgba(255,255,255,.06);
+      transition: border-color .25s, transform .25s;
+    }
+    .hero-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+    .hero-thumb:hover img { transform: scale(1.06); }
+    .hero-thumb:hover { border-color: var(--gold); transform: translateX(-3px); }
+    .hero-thumb.active { border-color: var(--gold); }
+    .hero-thumb.active::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--gold); z-index: 2;
+    }
+    .thumb-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.3);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .25s;
+    }
+    .hero-thumb:hover .thumb-overlay { opacity: 1; }
+    .thumb-play {
+      width: 26px; height: 26px; background: var(--gold); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Scroll indicator */
+    .scroll-ind {
+      position: absolute; right: 48px; bottom: 40px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      opacity: 0; animation: fadeIn 1s 1.2s forwards;
+    }
+    .scroll-ind span { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; }
+    .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+
+    /* ===== SECTIONS BELOW ===== */
+    .section-wrap { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+
+    .projects-section { padding: 100px 0; }
+    .projects-section .section-wrap { }
+    .section-label { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px,5vw,64px); letter-spacing: .03em; color: var(--text); margin-bottom: 40px; }
+    .projects-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+    .project-card { position: relative; aspect-ratio: 16/9; background: var(--bg3); overflow: hidden; cursor: none; }
+    .project-card.featured { grid-column: span 2; }
+    .project-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .project-placeholder-icon { font-size: 28px; opacity: .12; }
+    .project-card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,.8) 0%, transparent 60%); opacity: 0; transition: opacity .3s; }
+    .project-card:hover .project-card-inner { opacity: 1; }
+    .project-tag { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+    .project-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: .05em; color: #fff; }
+
+    .about-section { padding: 100px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; border-top: 1px solid var(--border); }
+    .about-section .section-wrap { display: contents; }
+    .about-left { padding: 0 0 0 48px; max-width: 700px; }
+    .about-right { padding: 0 48px 0 0; }
+    .about-text { font-size: 15px; line-height: 1.9; color: #aaa; margin-top: 20px; }
+    .about-text strong { color: var(--text); font-weight: 400; }
+    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 40px; }
+    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--gold); line-height: 1; }
+    .stat-label { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+    .about-card { background: var(--bg3); border: 1px solid var(--border); padding: 36px; }
+    .skills-list { list-style: none; margin-top: 20px; }
+    .skills-list li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; color: var(--muted); }
+    .skills-list li:last-child { border-bottom: none; }
+    .skill-bar { width: 72px; height: 2px; background: rgba(255,255,255,.08); position: relative; overflow: hidden; }
+    .skill-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold); }
+
+    .contact-section { padding: 100px 0; border-top: 1px solid var(--border); }
+    .contact-section .section-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .contact-big { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px,5.5vw,80px); line-height: .95; letter-spacing: .02em; margin-top: 12px; }
+    .contact-big span { color: var(--gold); }
+    .contact-right { padding-top: 56px; }
+    .contact-item { margin-bottom: 32px; }
+    .contact-item-label { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .contact-item-value { font-size: 15px; color: var(--text); text-decoration: none; transition: color .2s; border-bottom: 1px solid transparent; display: inline-block; }
+    .contact-item-value:hover { color: var(--gold); border-color: var(--border); }
+    .social-row { display: flex; gap: 12px; margin-top: 40px; }
+    .social-btn { width: 42px; height: 42px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; transition: border-color .2s, color .2s, background .2s; }
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(240,192,64,.05); }
+
+    footer { padding: 24px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; max-width: 100%; }
+    footer p { font-size: 11px; color: var(--muted); letter-spacing: .08em; }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes scrollPulse { 0%,100% { opacity:.3; } 50% { opacity:1; } }
+
+    /* Mobile */
+    @media (max-width: 860px) {
+      .hero { padding: 0 20px; align-items: flex-start; padding-top: 80px; }
+      .hero-master { flex-direction: column; gap: 16px; }
+      .hero-text { width: 100%; }
+      .hero-player { width: 100% !important; }
+      .hero-player-box { width: 100% !important; height: auto !important; padding-bottom: 56.25%; position: relative; }
+      .hero-thumbs { flex-direction: row !important; width: 100% !important; }
+      .hero-thumb { flex: 1 !important; width: auto !important; height: auto !important; aspect-ratio: 16/9; }
+      .scroll-ind { display: none; }
       .projects-grid { grid-template-columns: 1fr; }
       .project-card.featured { grid-column: span 1; }
-      .about-section { grid-template-columns: 1fr; gap: 48px; }
-      .contact-section { grid-template-columns: 1fr; gap: 48px; }
-      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
-      .scroll-indicator { display: none; }
+      .about-section { grid-template-columns: 1fr; }
+      .about-left, .about-right { padding: 0 20px; }
+      .contact-section .section-wrap { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Custom cursor -->
   <div class="cursor" id="cursor"></div>
   <div class="cursor-ring" id="cursorRing"></div>
 
-  <!-- NAV -->
   <nav id="navbar">
     <div class="nav-inner">
       <a href="#" class="logo">B<span>.</span>MOTION</a>
       <ul class="nav-links">
-        <li><a href="#reel">Reel</a></li>
         <li><a href="#projetos">Projetos</a></li>
         <li><a href="#sobre">Sobre</a></li>
         <li><a href="#contato">Contato</a></li>
@@ -730,98 +298,69 @@
   </nav>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero" id="hero">
     <div class="hero-bg"></div>
-    <div class="hero-noise"></div>
 
-    <!-- Master container -->
-    <div class="hero-master">
+    <div class="hero-master" id="heroMaster">
 
-    <!-- Col 1: text -->
-    <div class="hero-content">
-      <p class="hero-tag">Motion Designer &amp; Editor de Vídeo</p>
-      <h1>
-        BERNARDO<br>
-        <em>RODRIGUES</em>
-      </h1>
-      <p class="hero-sub">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Movimento, ritmo e narrativa — transformando ideias em experiências visuais que ficam na memória.
-      </p>
-      <div class="hero-cta">
-        <a href="#projetos" class="btn-primary">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-          Ver Projetos
-        </a>
-        <a href="#contato" class="btn-secondary">Falar comigo</a>
-      </div>
-    </div>
-
-    <!-- Col 2: main player -->
-    <div class="hero-player">
-      <div class="hero-player-inner">
-      <div class="hero-player-wrapper">
-        <iframe
-          id="heroIframe"
-          src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=F0C040"
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowfullscreen
-        ></iframe>
-      </div>
-      </div>
-    </div>
-
-    <!-- Col 3: thumbnails -->
-    <div class="hero-thumbs">
-
-      <div class="hero-thumb active"
-           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-           data-label="Motion Reel">
-        <img src="MTC-CAPA.gif" alt="Motion Reel" />
-        <div class="hero-thumb-overlay">
-          <div class="hero-thumb-play">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
-          </div>
+      <!-- Col 1: Texto -->
+      <div class="hero-text">
+        <p class="hero-eyebrow">Motion Designer & Editor de Vídeo</p>
+        <h1 class="hero-name" id="heroName">BERNARDO<br><em>RODRIGUES</em></h1>
+        <p class="hero-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Movimento, ritmo e narrativa — transformando ideias em experiências visuais que ficam na memória.</p>
+        <div class="hero-actions">
+          <a href="#projetos" class="btn-gold">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+            Ver Projetos
+          </a>
+          <a href="#contato" class="btn-ghost">Falar comigo</a>
         </div>
       </div>
 
-      <div class="hero-thumb"
-           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-           data-label="New Normal">
-        <img src="new-normal-capa.gif" alt="New Normal" />
-        <div class="hero-thumb-overlay">
-          <div class="hero-thumb-play">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
-          </div>
+      <!-- Col 2: Player principal -->
+      <div class="hero-player" id="heroPlayer">
+        <div class="hero-player-box" id="heroPlayerBox">
+          <iframe id="heroIframe"
+            src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=F0C040"
+            allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
         </div>
       </div>
 
-      <div class="hero-thumb"
-           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-           data-label="Zappo Delivery">
-        <img src="Zappo-CAPA.gif" alt="Zappo Delivery" />
-        <div class="hero-thumb-overlay">
-          <div class="hero-thumb-play">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
-          </div>
+      <!-- Col 3: Miniaturas -->
+      <div class="hero-thumbs" id="heroThumbs">
+
+        <div class="hero-thumb active" id="heroThumb"
+          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+          data-label="Motion Reel">
+          <img src="MTC-CAPA.gif" alt="Motion Reel" />
+          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
         </div>
-      </div>
 
-      <div class="hero-thumb"
-           data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-           data-label="Projeto 4">
-        <img src="MTC-CAPA.gif" alt="Projeto 4" />
-        <div class="hero-thumb-overlay">
-          <div class="hero-thumb-play">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg>
-          </div>
+        <div class="hero-thumb"
+          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+          data-label="New Normal">
+          <img src="new-normal-capa.gif" alt="New Normal" />
+          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
         </div>
+
+        <div class="hero-thumb"
+          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+          data-label="Zappo Delivery">
+          <img src="Zappo-CAPA.gif" alt="Zappo Delivery" />
+          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        </div>
+
+        <div class="hero-thumb"
+          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
+          data-label="Projeto 4">
+          <img src="MTC-CAPA.gif" alt="Projeto 4" />
+          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
+        </div>
+
       </div>
-
-    </div>
-
     </div><!-- /hero-master -->
 
-    <div class="scroll-indicator">
+    <div class="scroll-ind">
       <div class="scroll-line"></div>
       <span>Scroll</span>
     </div>
@@ -829,59 +368,15 @@
 
   <!-- PROJECTS -->
   <section class="projects-section" id="projetos">
-    <p class="section-label reveal">Trabalhos</p>
-    <h2 class="section-title reveal reveal-delay-1">PROJETOS<br>SELECIONADOS</h2>
-
-    <div class="projects-grid">
-      <!-- Featured -->
-      <div class="project-card featured reveal">
-        <div class="project-placeholder">
-          <span class="project-placeholder-icon">▶</span>
-        </div>
-        <div class="project-card-inner">
-          <p class="project-tag">Motion Design</p>
-          <h3 class="project-title">Projeto em Destaque</h3>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-1">
-        <div class="project-placeholder">
-          <span class="project-placeholder-icon">▶</span>
-        </div>
-        <div class="project-card-inner">
-          <p class="project-tag">Edição</p>
-          <h3 class="project-title">Projeto 02</h3>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-1">
-        <div class="project-placeholder">
-          <span class="project-placeholder-icon">▶</span>
-        </div>
-        <div class="project-card-inner">
-          <p class="project-tag">Animação</p>
-          <h3 class="project-title">Projeto 03</h3>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-2">
-        <div class="project-placeholder">
-          <span class="project-placeholder-icon">▶</span>
-        </div>
-        <div class="project-card-inner">
-          <p class="project-tag">Motion Design</p>
-          <h3 class="project-title">Projeto 04</h3>
-        </div>
-      </div>
-
-      <div class="project-card reveal reveal-delay-2">
-        <div class="project-placeholder">
-          <span class="project-placeholder-icon">▶</span>
-        </div>
-        <div class="project-card-inner">
-          <p class="project-tag">Branding</p>
-          <h3 class="project-title">Projeto 05</h3>
-        </div>
+    <div class="section-wrap">
+      <p class="section-label reveal">Trabalhos</p>
+      <h2 class="section-title reveal reveal-delay-1">PROJETOS<br>SELECIONADOS</h2>
+      <div class="projects-grid">
+        <div class="project-card featured reveal"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Motion Design</p><h3 class="project-title">Projeto em Destaque</h3></div></div>
+        <div class="project-card reveal reveal-delay-1"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Edição</p><h3 class="project-title">Projeto 02</h3></div></div>
+        <div class="project-card reveal reveal-delay-1"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Animação</p><h3 class="project-title">Projeto 03</h3></div></div>
+        <div class="project-card reveal reveal-delay-2"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Motion Design</p><h3 class="project-title">Projeto 04</h3></div></div>
+        <div class="project-card reveal reveal-delay-2"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Branding</p><h3 class="project-title">Projeto 05</h3></div></div>
       </div>
     </div>
   </section>
@@ -891,53 +386,23 @@
     <div class="about-left">
       <p class="section-label reveal">Sobre</p>
       <h2 class="section-title reveal reveal-delay-1">QUEM<br>SOU EU</h2>
-      <p class="about-text reveal reveal-delay-2">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. <strong>Motion designer e editor de vídeo</strong> com foco em narrativa visual e movimento com propósito.<br><br>
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. <strong>Projetos para marcas, agências e criadores de conteúdo.</strong>
-      </p>
+      <p class="about-text reveal reveal-delay-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Motion designer e editor de vídeo</strong> com foco em narrativa visual e movimento com propósito.<br><br>Projetos para <strong>marcas, agências e criadores de conteúdo.</strong></p>
       <div class="about-stats reveal reveal-delay-3">
-        <div>
-          <div class="stat-num">+50</div>
-          <div class="stat-label">Projetos entregues</div>
-        </div>
-        <div>
-          <div class="stat-num">15+</div>
-          <div class="stat-label">Anos de experiência</div>
-        </div>
-        <div>
-          <div class="stat-num">+20</div>
-          <div class="stat-label">Clientes atendidos</div>
-        </div>
-        <div>
-          <div class="stat-num">∞</div>
-          <div class="stat-label">Coquinha consumida</div>
-        </div>
+        <div><div class="stat-num">+50</div><div class="stat-label">Projetos entregues</div></div>
+        <div><div class="stat-num">15+</div><div class="stat-label">Anos de experiência</div></div>
+        <div><div class="stat-num">+20</div><div class="stat-label">Clientes atendidos</div></div>
+        <div><div class="stat-num">∞</div><div class="stat-label">Coquinha consumida</div></div>
       </div>
     </div>
     <div class="about-right reveal reveal-delay-2">
       <div class="about-card">
         <p class="section-label">Ferramentas</p>
         <ul class="skills-list">
-          <li>
-            Adobe After Effects
-            <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
-          </li>
-          <li>
-            Premiere Pro
-            <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
-          </li>
-          <li>
-            Adobe Illustrator
-            <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div>
-          </li>
-          <li>
-            Cinema 4D
-            <div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div>
-          </li>
-          <li>
-            DaVinci Resolve
-            <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div>
-          </li>
+          <li>Adobe After Effects <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div></li>
+          <li>Premiere Pro <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></li>
+          <li>Adobe Illustrator <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></li>
+          <li>Cinema 4D <div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div></li>
+          <li>DaVinci Resolve <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div></li>
         </ul>
       </div>
     </div>
@@ -945,40 +410,25 @@
 
   <!-- CONTACT -->
   <section class="contact-section" id="contato">
-    <div class="contact-left">
-      <p class="section-label reveal">Contato</p>
-      <h2 class="contact-big reveal reveal-delay-1">
-        VAMOS<br>
-        <span>CRIAR</span><br>
-        JUNTOS?
-      </h2>
-    </div>
-    <div class="contact-right">
-      <div class="contact-item reveal">
-        <span class="contact-item-label">E-mail</span>
-        <a href="mailto:contato@bemotion.com.br" class="contact-item-value">contato@bemotion.com.br</a>
+    <div class="section-wrap">
+      <div class="contact-left">
+        <p class="section-label reveal">Contato</p>
+        <h2 class="contact-big reveal reveal-delay-1">VAMOS<br><span>CRIAR</span><br>JUNTOS?</h2>
       </div>
-      <div class="contact-item reveal reveal-delay-1">
-        <span class="contact-item-label">WhatsApp</span>
-        <a href="https://wa.me/5521988011573" class="contact-item-value" target="_blank" rel="noopener">(21) 98801-1573</a>
-      </div>
-      <div class="social-row reveal reveal-delay-2">
-        <a href="#" class="social-btn" title="Instagram" aria-label="Instagram">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-        </a>
-        <a href="#" class="social-btn" title="LinkedIn" aria-label="LinkedIn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 10v7M7 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg>
-        </a>
-        <a href="https://vimeo.com" class="social-btn" title="Vimeo" aria-label="Vimeo" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 7.5c-.2 3.5-2.6 8.3-7 14.3C9.5 28 6.5 22 5 15c-.5-2.5.5-5 3-5 2 0 3 1.5 3 4 0 1-.3 2-.5 2.5 1-1 2-3 2.5-5.5.3-1.5.2-2.7-.3-3.5-.5-.8-1.3-1-2.2-.8C12.5 5.8 14 5 16 5c3 0 5 2 5 2.5z"/></svg>
-        </a>
+      <div class="contact-right">
+        <div class="contact-item reveal"><span class="contact-item-label">E-mail</span><a href="mailto:contato@bemotion.com.br" class="contact-item-value">contato@bemotion.com.br</a></div>
+        <div class="contact-item reveal reveal-delay-1"><span class="contact-item-label">WhatsApp</span><a href="https://wa.me/5521988011573" class="contact-item-value" target="_blank">(21) 98801-1573</a></div>
+        <div class="social-row reveal reveal-delay-2">
+          <a href="#" class="social-btn" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" class="social-btn" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 10v7M7 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg></a>
+          <a href="https://vimeo.com" class="social-btn" aria-label="Vimeo" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 7.5c-.2 3.5-2.6 8.3-7 14.3C9.5 28 6.5 22 5 15c-.5-2.5.5-5 3-5 2 0 3 1.5 3 4 0 1-.3 2-.5 2.5 1-1 2-3 2.5-5.5.3-1.5.2-2.7-.3-3.5-.5-.8-1.3-1-2.2-.8C12.5 5.8 14 5 16 5c3 0 5 2 5 2.5z"/></svg></a>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
-    <p>© 2024 Bernardo Rodrigues — bemotion.com.br</p>
+    <p>© 2025 Bernardo Rodrigues — bemotion.com.br</p>
     <p>Motion Design & Edição de Vídeo — Rio de Janeiro, BR</p>
   </footer>
 
@@ -988,77 +438,105 @@
     const ring = document.getElementById('cursorRing');
     let mx = 0, my = 0, rx = 0, ry = 0;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    function animateCursor() {
-      cursor.style.left = mx + 'px';
-      cursor.style.top = my + 'px';
-      rx += (mx - rx) * 0.12;
-      ry += (my - ry) * 0.12;
-      ring.style.left = rx + 'px';
-      ring.style.top = ry + 'px';
-      requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        cursor.style.width = '20px'; cursor.style.height = '20px';
-        ring.style.width = '56px'; ring.style.height = '56px';
-      });
-      el.addEventListener('mouseleave', () => {
-        cursor.style.width = '10px'; cursor.style.height = '10px';
-        ring.style.width = '36px'; ring.style.height = '36px';
-      });
+    (function tick() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * .12; ry += (my - ry) * .12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(tick);
+    })();
+    document.querySelectorAll('a,button').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; ring.style.width = '56px'; ring.style.height = '56px'; });
+      el.addEventListener('mouseleave', () => { cursor.style.width = '10px'; cursor.style.height = '10px'; ring.style.width = '36px'; ring.style.height = '36px'; });
     });
 
-    // Scroll nav
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 60);
-    });
+    // Nav scroll
+    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', scrollY > 60));
 
-    // Reveal on scroll
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-    }, { threshold: 0.1 });
-    reveals.forEach(el => observer.observe(el));
+    // Reveal
+    const ro = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: .1 });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-    // Resize thumbs to exactly match player height
-    function syncThumbs() {
-      const playerWrapper = document.querySelector('.hero-player-wrapper');
-      const thumbsEl = document.querySelector('.hero-thumbs');
-      const thumbEls = document.querySelectorAll('.hero-thumb');
-      if (!playerWrapper || !thumbsEl || !thumbEls.length) return;
-      const playerH = playerWrapper.getBoundingClientRect().height;
-      if (playerH === 0) return;
-      const n = thumbEls.length;
-      const gap = 8;
-      const thumbH = (playerH - gap * (n - 1)) / n;
-      const thumbW = Math.round(thumbH * 16 / 9);
-      thumbsEl.style.width = thumbW + 'px';
-      thumbEls.forEach(t => {
-        t.style.width = thumbW + 'px';
-        t.style.height = thumbH + 'px';
+    // =====================
+    // HERO LAYOUT ENGINE
+    // Calcula tudo baseado na altura real disponível
+    // =====================
+    function layoutHero() {
+      const NAV_H = 72;          // altura do nav
+      const PAD_V = 40;          // padding vertical hero (top+bottom)/2
+      const GAP = 20;            // gap entre colunas
+      const TEXT_W = 220;        // largura fixa da coluna texto
+      const THUMB_GAP = 8;       // gap entre thumbs
+      const N_THUMBS = 4;        // número de thumbs
+
+      const winW = window.innerWidth;
+      const winH = window.innerHeight;
+
+      // Altura disponível para o conteúdo
+      const availH = winH - NAV_H - PAD_V * 2;
+
+      // Largura disponível para player+thumbs (após texto e gaps)
+      const availW = Math.min(winW - 96, 1400) - TEXT_W - GAP * 2;
+
+      // thumb_w + player_w = availW
+      // player_h = availH  →  player_w = availH * 16/9
+      // thumb_h = availH   →  thumb_w = (availH - THUMB_GAP*(N-1)) / N * 16/9
+      const thumbH = (availH - THUMB_GAP * (N_THUMBS - 1)) / N_THUMBS;
+      const thumbW = thumbH * 16 / 9;
+      const playerW = availW - thumbW - GAP;
+      const playerH = playerW * 9 / 16;
+
+      // Se o playerH calculado > availH, recalcular a partir da altura
+      let finalPlayerH, finalPlayerW, finalThumbW, finalThumbH;
+      if (playerH > availH) {
+        finalPlayerH = availH;
+        finalPlayerW = finalPlayerH * 16 / 9;
+        finalThumbH = (availH - THUMB_GAP * (N_THUMBS - 1)) / N_THUMBS;
+        finalThumbW = finalThumbH * 16 / 9;
+      } else {
+        finalPlayerH = playerH;
+        finalPlayerW = playerW;
+        finalThumbH = thumbH;
+        finalThumbW = thumbW;
+      }
+
+      // Aplicar ao player
+      const playerEl = document.getElementById('heroPlayer');
+      const playerBox = document.getElementById('heroPlayerBox');
+      playerEl.style.width = finalPlayerW + 'px';
+      playerBox.style.width = finalPlayerW + 'px';
+      playerBox.style.height = finalPlayerH + 'px';
+
+      // Aplicar às thumbs
+      const thumbsEl = document.getElementById('heroThumbs');
+      thumbsEl.style.width = finalThumbW + 'px';
+      document.querySelectorAll('.hero-thumb').forEach(t => {
+        t.style.width = finalThumbW + 'px';
+        t.style.height = finalThumbH + 'px';
       });
-    }
-    window.addEventListener('load', syncThumbs);
-    window.addEventListener('resize', syncThumbs);
-    setTimeout(syncThumbs, 200);
-    setTimeout(syncThumbs, 800);
 
-    // Thumbnail carousel
-    const thumbs = document.querySelectorAll('.hero-thumb');
+      // Centralizar master verticalmente
+      const master = document.getElementById('heroMaster');
+      const masterH = finalPlayerH; // altura real do bloco
+      const topOffset = NAV_H + Math.max(PAD_V, (winH - NAV_H - masterH) / 2);
+      master.style.marginTop = (topOffset - NAV_H) + 'px';
+
+      // Fonte do nome: proporcional à altura disponível, cap em 80px
+      const fontSize = Math.min(finalPlayerH * 0.22, 80);
+      document.getElementById('heroName').style.fontSize = fontSize + 'px';
+    }
+
+    layoutHero();
+    window.addEventListener('resize', layoutHero);
+
+    // Carousel
     const iframe = document.getElementById('heroIframe');
-    const label = document.getElementById('heroLabel');
-    thumbs.forEach(thumb => {
+    document.querySelectorAll('.hero-thumb').forEach(thumb => {
       thumb.addEventListener('click', () => {
-        thumbs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.hero-thumb').forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
         iframe.src = thumb.dataset.src;
-        if (label) label.textContent = thumb.dataset.label;
       });
     });
-
-
   </script>
 </body>
 </html>

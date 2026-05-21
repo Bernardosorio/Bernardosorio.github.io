@@ -111,18 +111,18 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 80px 48px 60px;
+      padding: 80px 24px 60px;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
     }
 
-    /* Master: centralizado, ocupa largura toda */
+    /* Master: alinhado à esquerda, player empurrado pra direita */
     .hero-master {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 24px;
       width: 100%;
       padding-top: calc((100vh - 140px - (55vw * 9 / 16)) / 2);
@@ -131,7 +131,7 @@
     /* --- Container 1: Texto --- */
     .hero-content {
       flex-shrink: 0;
-      width: 260px;
+      width: 240px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -148,12 +148,10 @@
       animation: fadeUp 0.8s 0.4s forwards;
     }
 
-    /* --- Container 2: Player ---
-       55vw de largura — ocupa a maior parte da tela
-       sem dominar. Altura = 55vw * 9/16 automaticamente. */
+    /* --- Container 2: Player: flex:1 ocupa o máximo disponível --- */
     .hero-player {
-      flex-shrink: 0;
-      width: 55vw;
+      flex: 1;
+      min-width: 0;
       max-width: 900px;
       display: flex;
       flex-direction: column;
@@ -188,21 +186,25 @@
     .hero-player-label span { color: var(--gold); }
 
     /* --- Container 3: GIFs ---
-       Largura = 55vw * 9/16 / 3 * 16/9 para que
-       3 thumbs empilhadas tenham a mesma altura do player.
-       Na prática: thumbs com largura fixa de 180px. */
+       Thumb width calculado para que 4 thumbs + 3 gaps de 8px
+       = altura do player (flex:1 width * 9/16).
+       thumb_h = (player_h - 24px) / 4
+       thumb_w = thumb_h * 16/9
+       Como player usa flex:1, usamos vw como aproximação:
+       player_w ≈ 100vw - 240px - 24px - 24px - thumb_w
+       Simplificando: thumb_w fixo em 200px dá boa proporção */
     .hero-thumbs {
       flex-shrink: 0;
-      width: 180px;
+      width: 200px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 10px;
+      gap: 8px;
       position: relative;
       z-index: 1;
     }
     .hero-thumb {
-      width: 180px;
+      width: 200px;
       aspect-ratio: 16 / 9;
       position: relative;
       overflow: hidden;
@@ -1001,6 +1003,29 @@
     }, { threshold: 0.1 });
     reveals.forEach(el => observer.observe(el));
 
+    // Resize thumbs to exactly match player height
+    function syncThumbs() {
+      const playerWrapper = document.querySelector('.hero-player-wrapper');
+      const thumbsEl = document.querySelector('.hero-thumbs');
+      const thumbEls = document.querySelectorAll('.hero-thumb');
+      if (!playerWrapper || !thumbsEl || !thumbEls.length) return;
+      const playerH = playerWrapper.getBoundingClientRect().height;
+      if (playerH === 0) return;
+      const n = thumbEls.length;
+      const gap = 8;
+      const thumbH = (playerH - gap * (n - 1)) / n;
+      const thumbW = Math.round(thumbH * 16 / 9);
+      thumbsEl.style.width = thumbW + 'px';
+      thumbEls.forEach(t => {
+        t.style.width = thumbW + 'px';
+        t.style.height = thumbH + 'px';
+      });
+    }
+    window.addEventListener('load', syncThumbs);
+    window.addEventListener('resize', syncThumbs);
+    setTimeout(syncThumbs, 200);
+    setTimeout(syncThumbs, 800);
+
     // Thumbnail carousel
     const thumbs = document.querySelectorAll('.hero-thumb');
     const iframe = document.getElementById('heroIframe');
@@ -1010,7 +1035,7 @@
         thumbs.forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
         iframe.src = thumb.dataset.src;
-        label.textContent = thumb.dataset.label;
+        if (label) label.textContent = thumb.dataset.label;
       });
     });
 

@@ -64,8 +64,8 @@
       z-index: 100;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 28px 60px;
+      justify-content: center;
+      padding: 0 60px;
       background: linear-gradient(to bottom, rgba(10,10,12,0.95) 0%, transparent 100%);
       backdrop-filter: blur(0px);
       transition: backdrop-filter 0.3s, padding 0.3s;
@@ -73,8 +73,19 @@
     nav.scrolled {
       backdrop-filter: blur(20px);
       background: rgba(10,10,12,0.92);
-      padding: 18px 60px;
       border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      padding: 28px 0;
+      transition: padding 0.3s;
+    }
+    nav.scrolled .nav-inner {
+      padding: 18px 0;
     }
     .logo {
       font-family: 'Bebas Neue', sans-serif;
@@ -111,13 +122,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 80px 24px 60px;
+      padding: 80px 60px 60px;
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
     }
 
-    /* Master: alinhado à esquerda, player empurrado pra direita */
+    /* Master: largura máxima de 1200px, centralizado.
+       Em 21:9 as laterais ficam vazias — intencional. */
     .hero-master {
       display: flex;
       flex-direction: row;
@@ -125,6 +137,7 @@
       justify-content: flex-start;
       gap: 24px;
       width: 100%;
+      max-width: 1200px;
       padding-top: calc((100vh - 140px - (55vw * 9 / 16)) / 2);
     }
 
@@ -701,13 +714,15 @@
 
   <!-- NAV -->
   <nav id="navbar">
-    <a href="#" class="logo">B<span>.</span>MOTION</a>
-    <ul class="nav-links">
-      <li><a href="#reel">Reel</a></li>
-      <li><a href="#projetos">Projetos</a></li>
-      <li><a href="#sobre">Sobre</a></li>
-      <li><a href="#contato">Contato</a></li>
-    </ul>
+    <div class="nav-inner">
+      <a href="#" class="logo">B<span>.</span>MOTION</a>
+      <ul class="nav-links">
+        <li><a href="#reel">Reel</a></li>
+        <li><a href="#projetos">Projetos</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+    </div>
   </nav>
 
   <!-- HERO -->

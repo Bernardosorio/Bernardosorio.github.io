@@ -135,16 +135,18 @@
       flex-direction: row;
       align-items: flex-start;
       justify-content: flex-start;
-      gap: 24px;
+      gap: 1.5vw;
       width: 100%;
-      max-width: 1600px;
+      max-width: 1280px;
       padding-top: calc((100vh - 140px - (62vw * 9 / 16)) / 2);
     }
 
     /* --- Container 1: Texto --- */
     .hero-content {
       flex-shrink: 0;
-      width: 240px;
+      width: 16vw;
+      min-width: 180px;
+      max-width: 260px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -153,7 +155,7 @@
     }
     .hero h1 {
       font-family: "Bebas Neue", sans-serif;
-      font-size: clamp(40px, 3.6vw, 76px);
+      font-size: min(3.6vw, 68px);
       line-height: 0.92;
       letter-spacing: 0.02em;
       color: var(--text);
@@ -208,16 +210,18 @@
        Simplificando: thumb_w fixo em 200px dá boa proporção */
     .hero-thumbs {
       flex-shrink: 0;
-      width: 200px;
+      width: 13vw;
+      min-width: 130px;
+      max-width: 200px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      gap: 8px;
+      gap: 0.8vw;
       position: relative;
       z-index: 1;
     }
     .hero-thumb {
-      width: 200px;
+      width: 100%;
       aspect-ratio: 16 / 9;
       position: relative;
       overflow: hidden;

@@ -1,542 +1,579 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bernardo Rodrigues — Motion Designer & Editor</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,600;1,300&family=Barlow+Condensed:wght@700&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --gold: #F0C040;
-      --bg: #0a0a0c;
-      --bg3: #18181e;
-      --text: #e8e4dc;
-      --muted: #666;
-      --border: rgba(240,192,64,0.15);
+      --gold: #E8B84B;
+      --gold2: #c49a35;
+      --bg: #080808;
+      --bg2: #0f0f0f;
+      --bg3: #161616;
+      --text: #f0ece4;
+      --muted: #555;
+      --border: rgba(232,184,75,0.12);
     }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Barlow', sans-serif;
       font-weight: 300;
       overflow-x: hidden;
       cursor: none;
     }
 
-    /* Cursor */
-    .cursor { position: fixed; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .2s, height .2s; mix-blend-mode: difference; }
-    .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(240,192,64,.5); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: width .25s, height .25s; }
-
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 48px;
-      background: linear-gradient(to bottom, rgba(10,10,12,.95) 0%, transparent 100%);
-      transition: backdrop-filter .3s, background .3s;
+    /* ── CURSOR ── */
+    #cur {
+      position: fixed; width: 8px; height: 8px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: width .15s, height .15s;
+      mix-blend-mode: difference;
     }
-    nav.scrolled { backdrop-filter: blur(20px); background: rgba(10,10,12,.92); border-bottom: 1px solid var(--border); }
-    .nav-inner { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1400px; padding: 24px 0; transition: padding .3s; }
-    nav.scrolled .nav-inner { padding: 16px 0; }
-    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: .15em; color: var(--text); text-decoration: none; }
-    .logo span { color: var(--gold); }
+    #curR {
+      position: fixed; width: 32px; height: 32px;
+      border: 1px solid rgba(232,184,75,.4); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: width .2s, height .2s;
+    }
+
+    /* ── NAV ── */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 52px;
+      transition: background .4s, backdrop-filter .4s;
+    }
+    #nav.solid {
+      background: rgba(8,8,8,.94);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-in {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; max-width: 1440px; padding: 22px 0;
+      transition: padding .3s;
+    }
+    #nav.solid .nav-in { padding: 14px 0; }
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 19px; letter-spacing: .18em;
+      color: var(--text); text-decoration: none;
+    }
+    .logo b { color: var(--gold); font-weight: 400; }
     .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a { color: var(--muted); text-decoration: none; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; transition: color .2s; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none;
+      font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase;
+      transition: color .2s;
+    }
     .nav-links a:hover { color: var(--gold); }
 
-    /* ===== HERO =====
-       Estratégia: JS calcula a altura disponível (vh - nav),
-       define --hero-h como variável CSS.
-       Player ocupa --hero-h * 16/9 de largura.
-       Thumbs: altura = --hero-h, cada thumb = (h - 3*gap) / 4.
-       Texto: largura fixa 220px, fonte escala com --hero-h.
-    */
-    .hero {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 48px;
-      position: relative;
-      overflow: hidden;
+    /* ── HERO ── */
+    #hero {
+      height: 100vh; min-height: 600px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 52px;
+      position: relative; overflow: hidden;
     }
-    .hero-bg {
+
+    /* Grain overlay */
+    #hero::before {
+      content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 50% 60% at 60% 50%, rgba(240,192,64,.06) 0%, transparent 70%);
-      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 180px; opacity: .028; pointer-events: none; z-index: 0;
     }
 
-    /* Master: max 1400px, flex row */
-    .hero-master {
-      display: flex;
-      flex-direction: row;
+    /* Ambient glow */
+    .glow {
+      position: absolute; pointer-events: none; z-index: 0;
+      border-radius: 50%; filter: blur(120px); opacity: .18;
+    }
+    .glow-a { width: 700px; height: 500px; background: var(--gold); top: -100px; right: 20%; }
+    .glow-b { width: 400px; height: 400px; background: #a06020; bottom: 0; left: 10%; opacity: .1; }
+
+    /* Master row */
+    .h-master {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: row;
       align-items: flex-start;
-      gap: 20px;
-      width: 100%;
-      max-width: 1400px;
-      /* JS seta --hero-h e posiciona verticalmente */
+      gap: 24px;
+      width: 100%; max-width: 1440px;
     }
 
-    /* Col 1: texto */
-    .hero-text {
+    /* ── TEXT COL ── */
+    .h-text {
       flex-shrink: 0;
-      width: 220px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      padding-top: 2px;
+      display: flex; flex-direction: column; justify-content: flex-start;
     }
-    .hero-eyebrow {
-      font-size: 10px;
-      letter-spacing: .25em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 12px;
-      opacity: 0;
-      animation: fadeUp .7s .1s forwards;
+    .h-eyebrow {
+      font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 14px;
+      opacity: 0; animation: riseUp .6s .1s forwards;
     }
-    .hero-name {
+    .h-name {
       font-family: 'Bebas Neue', sans-serif;
-      /* font-size set by JS based on available height */
-      line-height: .92;
-      letter-spacing: .02em;
+      line-height: .88; letter-spacing: .01em;
       color: var(--text);
-      opacity: 0;
-      animation: fadeUp .7s .25s forwards;
+      opacity: 0; animation: riseUp .6s .2s forwards;
     }
-    .hero-name em { font-style: normal; color: var(--gold); }
-    .hero-desc {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.7;
-      margin-top: 16px;
-      opacity: 0;
-      animation: fadeUp .7s .4s forwards;
+    .h-name span { color: var(--gold); display: block; }
+    .h-rule {
+      width: 32px; height: 2px; background: var(--gold);
+      margin: 18px 0;
+      opacity: 0; animation: riseUp .6s .35s forwards;
     }
-    .hero-actions {
-      margin-top: 24px;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      flex-wrap: wrap;
-      opacity: 0;
-      animation: fadeUp .7s .55s forwards;
+    .h-desc {
+      font-size: 13px; line-height: 1.75; color: var(--muted);
+      opacity: 0; animation: riseUp .6s .45s forwards;
     }
-    .btn-gold {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--gold); color: #0a0a0c;
-      text-decoration: none; font-size: 11px; font-weight: 500;
+    .h-cta {
+      margin-top: 28px; display: flex; gap: 14px; align-items: center;
+      opacity: 0; animation: riseUp .6s .6s forwards;
+    }
+    .btn-fill {
+      display: inline-flex; align-items: center; gap: 9px;
+      background: var(--gold); color: #080808;
+      text-decoration: none; font-size: 10px; font-weight: 600;
+      letter-spacing: .2em; text-transform: uppercase;
+      padding: 11px 20px;
+      transition: background .2s, transform .15s;
+      white-space: nowrap;
+    }
+    .btn-fill:hover { background: #fff; transform: translateY(-2px); }
+    .btn-line {
+      color: var(--muted); text-decoration: none; font-size: 10px;
       letter-spacing: .15em; text-transform: uppercase;
-      padding: 12px 20px;
-      transition: background .2s, transform .2s; white-space: nowrap;
-    }
-    .btn-gold:hover { background: #fff; transform: translateY(-2px); }
-    .btn-ghost {
-      color: var(--muted); text-decoration: none; font-size: 11px;
-      letter-spacing: .1em; text-transform: uppercase;
-      border-bottom: 1px solid var(--border); padding-bottom: 2px;
+      border-bottom: 1px solid rgba(255,255,255,.12); padding-bottom: 2px;
       transition: color .2s, border-color .2s; white-space: nowrap;
     }
-    .btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+    .btn-line:hover { color: var(--gold); border-color: var(--gold); }
 
-    /* Col 2: player — JS seta width e height */
-    .hero-player {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
+    /* ── PLAYER COL ── */
+    .h-player { flex-shrink: 0; display: flex; flex-direction: column; }
+    .h-player-box {
+      position: relative; background: var(--bg3); overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
     }
-    .hero-player-box {
-      position: relative;
-      background: var(--bg3);
-      overflow: hidden;
+    .h-player-box iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%; border: none;
     }
-    .hero-player-box iframe {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%; border: none;
+    /* Thin gold border top */
+    .h-player-box::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold); z-index: 2;
     }
 
-    /* Col 3: thumbs — JS seta width/height de cada thumb */
-    .hero-thumbs {
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .hero-thumb {
-      flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
-      cursor: none;
+    /* ── THUMBS COL ── */
+    .h-thumbs { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
+    .h-thumb {
+      flex-shrink: 0; position: relative; overflow: hidden;
       border: 1px solid rgba(255,255,255,.06);
-      transition: border-color .25s, transform .25s;
+      transition: border-color .2s, transform .2s;
+      cursor: none;
     }
-    .hero-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
-    .hero-thumb:hover img { transform: scale(1.06); }
-    .hero-thumb:hover { border-color: var(--gold); transform: translateX(-3px); }
-    .hero-thumb.active { border-color: var(--gold); }
-    .hero-thumb.active::before {
+    .h-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+    .h-thumb:hover { border-color: var(--gold); transform: translateX(-3px); }
+    .h-thumb:hover img { transform: scale(1.06); }
+    .h-thumb.active { border-color: var(--gold); }
+    .h-thumb.active::after {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0;
       width: 3px; background: var(--gold); z-index: 2;
     }
-    .thumb-overlay {
+    .h-thumb-ov {
       position: absolute; inset: 0;
-      background: rgba(0,0,0,.3);
+      background: rgba(0,0,0,.35);
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .25s;
+      opacity: 0; transition: opacity .2s;
     }
-    .hero-thumb:hover .thumb-overlay { opacity: 1; }
-    .thumb-play {
-      width: 26px; height: 26px; background: var(--gold); border-radius: 50%;
+    .h-thumb:hover .h-thumb-ov { opacity: 1; }
+    .h-thumb-ov span {
+      width: 24px; height: 24px; background: var(--gold); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
     }
 
-    /* Scroll indicator */
-    .scroll-ind {
-      position: absolute; right: 48px; bottom: 40px;
+    /* Scroll cue */
+    .scroll-cue {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
       display: flex; flex-direction: column; align-items: center; gap: 8px;
-      opacity: 0; animation: fadeIn 1s 1.2s forwards;
+      opacity: 0; animation: fadeIn 1s 1.4s forwards;
     }
-    .scroll-ind span { font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); writing-mode: vertical-rl; }
-    .scroll-line { width: 1px; height: 50px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+    .scroll-cue span { font-size: 9px; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); }
+    .scroll-cue-line {
+      width: 1px; height: 44px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: pulse 2s ease-in-out infinite;
+    }
 
-    /* ===== SECTIONS BELOW ===== */
-    .section-wrap { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+    /* ── SECTIONS ── */
+    .wrap { max-width: 1440px; margin: 0 auto; padding: 0 52px; }
 
-    .projects-section { padding: 100px 0; }
-    .projects-section .section-wrap { }
-    .section-label { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(36px,5vw,64px); letter-spacing: .03em; color: var(--text); margin-bottom: 40px; }
-    .projects-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
-    .project-card { position: relative; aspect-ratio: 16/9; background: var(--bg3); overflow: hidden; cursor: none; }
-    .project-card.featured { grid-column: span 2; }
-    .project-placeholder { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-    .project-placeholder-icon { font-size: 28px; opacity: .12; }
-    .project-card-inner { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,.8) 0%, transparent 60%); opacity: 0; transition: opacity .3s; }
-    .project-card:hover .project-card-inner { opacity: 1; }
-    .project-tag { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
-    .project-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: .05em; color: #fff; }
+    /* Projects */
+    #projetos { padding: 120px 0; }
+    .sec-label { font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .sec-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 68px); letter-spacing: .03em; color: var(--text);
+      margin-bottom: 40px;
+    }
+    .proj-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+    .proj-card { position: relative; aspect-ratio: 16/9; background: var(--bg3); overflow: hidden; cursor: none; }
+    .proj-card.feat { grid-column: span 2; }
+    .proj-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .proj-ph-icon { font-size: 26px; opacity: .1; }
+    .proj-info {
+      position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 18px; background: linear-gradient(to top, rgba(0,0,0,.85) 0%, transparent 55%);
+      opacity: 0; transition: opacity .3s;
+    }
+    .proj-card:hover .proj-info { opacity: 1; }
+    .proj-card:hover img { transform: scale(1.04); }
+    .proj-cat { font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; }
+    .proj-name { font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: #fff; }
 
-    .about-section { padding: 100px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; border-top: 1px solid var(--border); }
-    .about-section .section-wrap { display: contents; }
-    .about-left { padding: 0 0 0 48px; max-width: 700px; }
-    .about-right { padding: 0 48px 0 0; }
-    .about-text { font-size: 15px; line-height: 1.9; color: #aaa; margin-top: 20px; }
-    .about-text strong { color: var(--text); font-weight: 400; }
-    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 40px; }
-    .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--gold); line-height: 1; }
-    .stat-label { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
-    .about-card { background: var(--bg3); border: 1px solid var(--border); padding: 36px; }
-    .skills-list { list-style: none; margin-top: 20px; }
-    .skills-list li { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04); font-size: 13px; color: var(--muted); }
-    .skills-list li:last-child { border-bottom: none; }
-    .skill-bar { width: 72px; height: 2px; background: rgba(255,255,255,.08); position: relative; overflow: hidden; }
-    .skill-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold); }
+    /* About */
+    #sobre {
+      padding: 120px 0;
+      border-top: 1px solid var(--border);
+    }
+    #sobre .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .about-body { font-size: 15px; line-height: 1.9; color: #888; margin-top: 20px; }
+    .about-body strong { color: var(--text); font-weight: 400; }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 44px; }
+    .stat-n { font-family: 'Bebas Neue', sans-serif; font-size: 54px; color: var(--gold); line-height: 1; }
+    .stat-l { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+    .skills-card { background: var(--bg3); border: 1px solid var(--border); padding: 36px; }
+    .skill-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+      font-size: 12px; color: var(--muted);
+    }
+    .skill-row:last-child { border-bottom: none; }
+    .skill-bar { width: 70px; height: 1px; background: rgba(255,255,255,.08); position: relative; }
+    .skill-bar::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; background: var(--gold); width: var(--pct); }
 
-    .contact-section { padding: 100px 0; border-top: 1px solid var(--border); }
-    .contact-section .section-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
-    .contact-big { font-family: 'Bebas Neue', sans-serif; font-size: clamp(44px,5.5vw,80px); line-height: .95; letter-spacing: .02em; margin-top: 12px; }
-    .contact-big span { color: var(--gold); }
-    .contact-right { padding-top: 56px; }
-    .contact-item { margin-bottom: 32px; }
-    .contact-item-label { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-    .contact-item-value { font-size: 15px; color: var(--text); text-decoration: none; transition: color .2s; border-bottom: 1px solid transparent; display: inline-block; }
-    .contact-item-value:hover { color: var(--gold); border-color: var(--border); }
-    .social-row { display: flex; gap: 12px; margin-top: 40px; }
-    .social-btn { width: 42px; height: 42px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--muted); text-decoration: none; transition: border-color .2s, color .2s, background .2s; }
-    .social-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(240,192,64,.05); }
+    /* Contact */
+    #contato { padding: 120px 0; border-top: 1px solid var(--border); }
+    #contato .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; }
+    .cta-big {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 84px); line-height: .9; letter-spacing: .02em;
+      margin-top: 14px;
+    }
+    .cta-big span { color: var(--gold); }
+    .ct-right { padding-top: 52px; }
+    .ct-item { margin-bottom: 30px; }
+    .ct-label { font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .ct-val { font-size: 15px; color: var(--text); text-decoration: none; transition: color .2s; display: inline-block; border-bottom: 1px solid transparent; }
+    .ct-val:hover { color: var(--gold); border-color: var(--border); }
+    .soc { display: flex; gap: 10px; margin-top: 36px; }
+    .soc-btn {
+      width: 40px; height: 40px; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--muted); text-decoration: none;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .soc-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(232,184,75,.06); }
 
-    footer { padding: 24px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; max-width: 100%; }
-    footer p { font-size: 11px; color: var(--muted); letter-spacing: .08em; }
+    footer {
+      padding: 20px 52px; border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer p { font-size: 10.5px; color: var(--muted); letter-spacing: .06em; }
 
-    /* Reveal */
-    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
-    .reveal.visible { opacity: 1; transform: none; }
-    .reveal-delay-1 { transition-delay: .1s; }
-    .reveal-delay-2 { transition-delay: .2s; }
-    .reveal-delay-3 { transition-delay: .3s; }
+    /* ── REVEAL ── */
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .rv.on { opacity: 1; transform: none; }
+    .rv.d1 { transition-delay: .1s; } .rv.d2 { transition-delay: .2s; } .rv.d3 { transition-delay: .3s; }
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:none; } }
+    /* ── KEYFRAMES ── */
+    @keyframes riseUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-    @keyframes scrollPulse { 0%,100% { opacity:.3; } 50% { opacity:1; } }
+    @keyframes pulse { 0%,100% { opacity:.3; } 50% { opacity:1; } }
 
-    /* Mobile */
-    @media (max-width: 860px) {
-      .hero { padding: 0 20px; align-items: flex-start; padding-top: 80px; }
-      .hero-master { flex-direction: column; gap: 16px; }
-      .hero-text { width: 100%; }
-      .hero-player { width: 100% !important; }
-      .hero-player-box { width: 100% !important; height: auto !important; padding-bottom: 56.25%; position: relative; }
-      .hero-thumbs { flex-direction: row !important; width: 100% !important; }
-      .hero-thumb { flex: 1 !important; width: auto !important; height: auto !important; aspect-ratio: 16/9; }
-      .scroll-ind { display: none; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .project-card.featured { grid-column: span 1; }
-      .about-section { grid-template-columns: 1fr; }
-      .about-left, .about-right { padding: 0 20px; }
-      .contact-section .section-wrap { grid-template-columns: 1fr; }
+    /* ── MOBILE ── */
+    @media (max-width: 840px) {
+      #hero { padding: 80px 20px 40px; align-items: flex-start; height: auto; min-height: 100vh; }
+      .h-master { flex-direction: column; }
+      .h-text { width: 100% !important; }
+      .h-player { width: 100% !important; }
+      .h-player-box { width: 100% !important; height: 0 !important; padding-bottom: 56.25%; position: relative; }
+      .h-thumbs { flex-direction: row !important; width: 100% !important; }
+      .h-thumb { flex: 1 !important; width: auto !important; height: auto !important; aspect-ratio: 16/9; }
+      .scroll-cue { display: none; }
+      #projetos, #sobre, #contato { padding: 80px 0; }
+      .wrap { padding: 0 20px; }
+      #sobre .wrap, #contato .wrap { grid-template-columns: 1fr; gap: 40px; }
+      .proj-grid { grid-template-columns: 1fr; }
+      .proj-card.feat { grid-column: span 1; }
       footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
     }
   </style>
 </head>
 <body>
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-ring" id="cursorRing"></div>
 
-  <nav id="navbar">
-    <div class="nav-inner">
-      <a href="#" class="logo">B<span>.</span>MOTION</a>
-      <ul class="nav-links">
-        <li><a href="#projetos">Projetos</a></li>
-        <li><a href="#sobre">Sobre</a></li>
-        <li><a href="#contato">Contato</a></li>
-      </ul>
-    </div>
-  </nav>
+<div id="cur"></div>
+<div id="curR"></div>
 
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <div class="hero-bg"></div>
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-in">
+    <a href="#" class="logo">B<b>.</b>MOTION</a>
+    <ul class="nav-links">
+      <li><a href="#projetos">Projetos</a></li>
+      <li><a href="#sobre">Sobre</a></li>
+      <li><a href="#contato">Contato</a></li>
+    </ul>
+  </div>
+</nav>
 
-    <div class="hero-master" id="heroMaster">
+<!-- HERO -->
+<section id="hero">
+  <div class="glow glow-a"></div>
+  <div class="glow glow-b"></div>
 
-      <!-- Col 1: Texto -->
-      <div class="hero-text">
-        <p class="hero-eyebrow">Motion Designer & Editor de Vídeo</p>
-        <h1 class="hero-name" id="heroName">BERNARDO<br><em>RODRIGUES</em></h1>
-        <p class="hero-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Movimento, ritmo e narrativa — transformando ideias em experiências visuais que ficam na memória.</p>
-        <div class="hero-actions">
-          <a href="#projetos" class="btn-gold">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-            Ver Projetos
-          </a>
-          <a href="#contato" class="btn-ghost">Falar comigo</a>
-        </div>
-      </div>
+  <div class="h-master" id="hMaster">
 
-      <!-- Col 2: Player principal -->
-      <div class="hero-player" id="heroPlayer">
-        <div class="hero-player-box" id="heroPlayerBox">
-          <iframe id="heroIframe"
-            src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=F0C040"
-            allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-        </div>
-      </div>
-
-      <!-- Col 3: Miniaturas -->
-      <div class="hero-thumbs" id="heroThumbs">
-
-        <div class="hero-thumb active" id="heroThumb"
-          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-          data-label="Motion Reel">
-          <img src="MTC-CAPA.gif" alt="Motion Reel" />
-          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-        </div>
-
-        <div class="hero-thumb"
-          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-          data-label="New Normal">
-          <img src="new-normal-capa.gif" alt="New Normal" />
-          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-        </div>
-
-        <div class="hero-thumb"
-          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-          data-label="Zappo Delivery">
-          <img src="Zappo-CAPA.gif" alt="Zappo Delivery" />
-          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-        </div>
-
-        <div class="hero-thumb"
-          data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=F0C040"
-          data-label="Projeto 4">
-          <img src="MTC-CAPA.gif" alt="Projeto 4" />
-          <div class="thumb-overlay"><div class="thumb-play"><svg width="9" height="9" viewBox="0 0 24 24" fill="#0a0a0c"><polygon points="5,3 19,12 5,21"/></svg></div></div>
-        </div>
-
-      </div>
-    </div><!-- /hero-master -->
-
-    <div class="scroll-ind">
-      <div class="scroll-line"></div>
-      <span>Scroll</span>
-    </div>
-  </section>
-
-  <!-- PROJECTS -->
-  <section class="projects-section" id="projetos">
-    <div class="section-wrap">
-      <p class="section-label reveal">Trabalhos</p>
-      <h2 class="section-title reveal reveal-delay-1">PROJETOS<br>SELECIONADOS</h2>
-      <div class="projects-grid">
-        <div class="project-card featured reveal"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Motion Design</p><h3 class="project-title">Projeto em Destaque</h3></div></div>
-        <div class="project-card reveal reveal-delay-1"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Edição</p><h3 class="project-title">Projeto 02</h3></div></div>
-        <div class="project-card reveal reveal-delay-1"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Animação</p><h3 class="project-title">Projeto 03</h3></div></div>
-        <div class="project-card reveal reveal-delay-2"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Motion Design</p><h3 class="project-title">Projeto 04</h3></div></div>
-        <div class="project-card reveal reveal-delay-2"><div class="project-placeholder"><span class="project-placeholder-icon">▶</span></div><div class="project-card-inner"><p class="project-tag">Branding</p><h3 class="project-title">Projeto 05</h3></div></div>
+    <!-- Texto -->
+    <div class="h-text" id="hText">
+      <p class="h-eyebrow">Motion Designer &amp; Editor de Vídeo</p>
+      <h1 class="h-name" id="hName">BERNARDO<span>RODRIGUES</span></h1>
+      <div class="h-rule"></div>
+      <p class="h-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Movimento, ritmo e narrativa — transformando ideias em experiências visuais que ficam na memória.</p>
+      <div class="h-cta">
+        <a href="#projetos" class="btn-fill">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          Ver Projetos
+        </a>
+        <a href="#contato" class="btn-line">Falar comigo</a>
       </div>
     </div>
-  </section>
 
-  <!-- ABOUT -->
-  <section class="about-section" id="sobre">
-    <div class="about-left">
-      <p class="section-label reveal">Sobre</p>
-      <h2 class="section-title reveal reveal-delay-1">QUEM<br>SOU EU</h2>
-      <p class="about-text reveal reveal-delay-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Motion designer e editor de vídeo</strong> com foco em narrativa visual e movimento com propósito.<br><br>Projetos para <strong>marcas, agências e criadores de conteúdo.</strong></p>
-      <div class="about-stats reveal reveal-delay-3">
-        <div><div class="stat-num">+50</div><div class="stat-label">Projetos entregues</div></div>
-        <div><div class="stat-num">15+</div><div class="stat-label">Anos de experiência</div></div>
-        <div><div class="stat-num">+20</div><div class="stat-label">Clientes atendidos</div></div>
-        <div><div class="stat-num">∞</div><div class="stat-label">Coquinha consumida</div></div>
+    <!-- Player principal -->
+    <div class="h-player" id="hPlayer">
+      <div class="h-player-box" id="hBox">
+        <iframe id="hIframe"
+          src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=E8B84B"
+          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
-    <div class="about-right reveal reveal-delay-2">
-      <div class="about-card">
-        <p class="section-label">Ferramentas</p>
-        <ul class="skills-list">
-          <li>Adobe After Effects <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div></li>
-          <li>Premiere Pro <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div></li>
-          <li>Adobe Illustrator <div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></li>
-          <li>Cinema 4D <div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div></li>
-          <li>DaVinci Resolve <div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div></li>
-        </ul>
+
+    <!-- Miniaturas -->
+    <div class="h-thumbs" id="hThumbs">
+
+      <div class="h-thumb active"
+        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
+        <img src="MTC-CAPA.gif" alt="Motion Reel"/>
+        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
+      </div>
+
+      <div class="h-thumb"
+        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
+        <img src="new-normal-capa.gif" alt="New Normal"/>
+        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
+      </div>
+
+      <div class="h-thumb"
+        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
+        <img src="Zappo-CAPA.gif" alt="Zappo Delivery"/>
+        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
+      </div>
+
+      <div class="h-thumb"
+        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
+        <img src="MTC-CAPA.gif" alt="Projeto 4"/>
+        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <div class="scroll-cue-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+
+<!-- PROJETOS -->
+<section id="projetos">
+  <div class="wrap">
+    <p class="sec-label rv">Trabalhos</p>
+    <h2 class="sec-title rv d1">PROJETOS<br>SELECIONADOS</h2>
+    <div class="proj-grid">
+      <div class="proj-card feat rv"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Projeto em Destaque</h3></div></div>
+      <div class="proj-card rv d1"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Edição</p><h3 class="proj-name">Projeto 02</h3></div></div>
+      <div class="proj-card rv d1"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Animação</p><h3 class="proj-name">Projeto 03</h3></div></div>
+      <div class="proj-card rv d2"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Projeto 04</h3></div></div>
+      <div class="proj-card rv d2"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Branding</p><h3 class="proj-name">Projeto 05</h3></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="wrap">
+    <div>
+      <p class="sec-label rv">Sobre</p>
+      <h2 class="sec-title rv d1">QUEM<br>SOU EU</h2>
+      <p class="about-body rv d2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore. <strong>Motion designer e editor de vídeo</strong> com foco em narrativa visual e movimento com propósito.<br><br>Projetos para <strong>marcas, agências e criadores de conteúdo.</strong></p>
+      <div class="stats rv d3">
+        <div><div class="stat-n">+50</div><div class="stat-l">Projetos entregues</div></div>
+        <div><div class="stat-n">15+</div><div class="stat-l">Anos de experiência</div></div>
+        <div><div class="stat-n">+20</div><div class="stat-l">Clientes atendidos</div></div>
+        <div><div class="stat-n">∞</div><div class="stat-l">Coquinha consumida</div></div>
       </div>
     </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="contact-section" id="contato">
-    <div class="section-wrap">
-      <div class="contact-left">
-        <p class="section-label reveal">Contato</p>
-        <h2 class="contact-big reveal reveal-delay-1">VAMOS<br><span>CRIAR</span><br>JUNTOS?</h2>
-      </div>
-      <div class="contact-right">
-        <div class="contact-item reveal"><span class="contact-item-label">E-mail</span><a href="mailto:contato@bemotion.com.br" class="contact-item-value">contato@bemotion.com.br</a></div>
-        <div class="contact-item reveal reveal-delay-1"><span class="contact-item-label">WhatsApp</span><a href="https://wa.me/5521988011573" class="contact-item-value" target="_blank">(21) 98801-1573</a></div>
-        <div class="social-row reveal reveal-delay-2">
-          <a href="#" class="social-btn" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
-          <a href="#" class="social-btn" aria-label="LinkedIn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 10v7M7 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg></a>
-          <a href="https://vimeo.com" class="social-btn" aria-label="Vimeo" target="_blank"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 7.5c-.2 3.5-2.6 8.3-7 14.3C9.5 28 6.5 22 5 15c-.5-2.5.5-5 3-5 2 0 3 1.5 3 4 0 1-.3 2-.5 2.5 1-1 2-3 2.5-5.5.3-1.5.2-2.7-.3-3.5-.5-.8-1.3-1-2.2-.8C12.5 5.8 14 5 16 5c3 0 5 2 5 2.5z"/></svg></a>
+    <div class="rv d2">
+      <div class="skills-card">
+        <p class="sec-label">Ferramentas</p>
+        <div style="margin-top:20px">
+          <div class="skill-row">Adobe After Effects <div class="skill-bar" style="--pct:95%"></div></div>
+          <div class="skill-row">Premiere Pro <div class="skill-bar" style="--pct:90%"></div></div>
+          <div class="skill-row">Adobe Illustrator <div class="skill-bar" style="--pct:75%"></div></div>
+          <div class="skill-row">Cinema 4D <div class="skill-bar" style="--pct:60%"></div></div>
+          <div class="skill-row">DaVinci Resolve <div class="skill-bar" style="--pct:70%"></div></div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer>
-    <p>© 2025 Bernardo Rodrigues — bemotion.com.br</p>
-    <p>Motion Design & Edição de Vídeo — Rio de Janeiro, BR</p>
-  </footer>
+<!-- CONTATO -->
+<section id="contato">
+  <div class="wrap">
+    <div>
+      <p class="sec-label rv">Contato</p>
+      <h2 class="cta-big rv d1">VAMOS<br><span>CRIAR</span><br>JUNTOS?</h2>
+    </div>
+    <div class="ct-right">
+      <div class="ct-item rv"><div class="ct-label">E-mail</div><a href="mailto:contato@bemotion.com.br" class="ct-val">contato@bemotion.com.br</a></div>
+      <div class="ct-item rv d1"><div class="ct-label">WhatsApp</div><a href="https://wa.me/5521988011573" class="ct-val" target="_blank">(21) 98801-1573</a></div>
+      <div class="soc rv d2">
+        <a href="#" class="soc-btn" aria-label="Instagram"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+        <a href="#" class="soc-btn" aria-label="LinkedIn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 10v7M7 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/></svg></a>
+        <a href="https://vimeo.com" class="soc-btn" aria-label="Vimeo" target="_blank"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 7.5c-.2 3.5-2.6 8.3-7 14.3C9.5 28 6.5 22 5 15c-.5-2.5.5-5 3-5 2 0 3 1.5 3 4 0 1-.3 2-.5 2.5 1-1 2-3 2.5-5.5.3-1.5.2-2.7-.3-3.5-.5-.8-1.3-1-2.2-.8C12.5 5.8 14 5 16 5c3 0 5 2 5 2.5z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
 
-  <script>
-    // Cursor
-    const cursor = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-    (function tick() {
-      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
-      rx += (mx - rx) * .12; ry += (my - ry) * .12;
-      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-      requestAnimationFrame(tick);
-    })();
-    document.querySelectorAll('a,button').forEach(el => {
-      el.addEventListener('mouseenter', () => { cursor.style.width = '20px'; cursor.style.height = '20px'; ring.style.width = '56px'; ring.style.height = '56px'; });
-      el.addEventListener('mouseleave', () => { cursor.style.width = '10px'; cursor.style.height = '10px'; ring.style.width = '36px'; ring.style.height = '36px'; });
-    });
+<footer>
+  <p>© 2025 Bernardo Rodrigues — bemotion.com.br</p>
+  <p>Motion Design &amp; Edição de Vídeo — Rio de Janeiro, BR</p>
+</footer>
 
-    // Nav scroll
-    window.addEventListener('scroll', () => document.getElementById('navbar').classList.toggle('scrolled', scrollY > 60));
+<script>
+// ── Cursor ──
+const cur = document.getElementById('cur');
+const curR = document.getElementById('curR');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e=>{mx=e.clientX;my=e.clientY;});
+(function tick(){
+  cur.style.left=mx+'px'; cur.style.top=my+'px';
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  curR.style.left=rx+'px'; curR.style.top=ry+'px';
+  requestAnimationFrame(tick);
+})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';curR.style.width='52px';curR.style.height='52px';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';curR.style.width='32px';curR.style.height='32px';});
+});
 
-    // Reveal
-    const ro = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: .1 });
-    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+// ── Nav ──
+window.addEventListener('scroll',()=>document.getElementById('nav').classList.toggle('solid',scrollY>50));
 
-    // =====================
-    // HERO LAYOUT ENGINE
-    // Calcula tudo baseado na altura real disponível
-    // =====================
-    function layoutHero() {
-      const NAV_H = 72;          // altura do nav
-      const PAD_V = 40;          // padding vertical hero (top+bottom)/2
-      const GAP = 20;            // gap entre colunas
-      const TEXT_W = 220;        // largura fixa da coluna texto
-      const THUMB_GAP = 8;       // gap entre thumbs
-      const N_THUMBS = 4;        // número de thumbs
+// ── Reveal ──
+const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:.08});
+document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
 
-      const winW = window.innerWidth;
-      const winH = window.innerHeight;
+// ── HERO LAYOUT ENGINE ──
+// Tudo calculado a partir da altura disponível real.
+// Player altura = availH → largura = availH * 16/9
+// Thumbs: 4 thumbs + 3 gaps enchem availH
+// Texto: largura restante
+function layoutHero(){
+  const isMobile = window.innerWidth <= 840;
+  if(isMobile) return;
 
-      // Altura disponível para o conteúdo
-      const availH = winH - NAV_H - PAD_V * 2;
+  const NAV   = 64;   // altura nav
+  const PV    = 48;   // padding vertical (top+bottom cada)
+  const GAP   = 24;   // gap entre colunas
+  const TGAP  = 8;    // gap entre thumbs
+  const NT    = 4;    // número de thumbs
+  const MAX_W = 1440; // max-width do master
 
-      // Largura disponível para player+thumbs (após texto e gaps)
-      const availW = Math.min(winW - 96, 1400) - TEXT_W - GAP * 2;
+  const winH  = window.innerHeight;
+  const winW  = window.innerWidth;
 
-      // thumb_w + player_w = availW
-      // player_h = availH  →  player_w = availH * 16/9
-      // thumb_h = availH   →  thumb_w = (availH - THUMB_GAP*(N-1)) / N * 16/9
-      const thumbH = (availH - THUMB_GAP * (N_THUMBS - 1)) / N_THUMBS;
-      const thumbW = thumbH * 16 / 9;
-      const playerW = availW - thumbW - GAP;
-      const playerH = playerW * 9 / 16;
+  // Altura disponível para o hero content
+  const availH = winH - NAV - PV * 2;
 
-      // Se o playerH calculado > availH, recalcular a partir da altura
-      let finalPlayerH, finalPlayerW, finalThumbW, finalThumbH;
-      if (playerH > availH) {
-        finalPlayerH = availH;
-        finalPlayerW = finalPlayerH * 16 / 9;
-        finalThumbH = (availH - THUMB_GAP * (N_THUMBS - 1)) / N_THUMBS;
-        finalThumbW = finalThumbH * 16 / 9;
-      } else {
-        finalPlayerH = playerH;
-        finalPlayerW = playerW;
-        finalThumbH = thumbH;
-        finalThumbW = thumbW;
-      }
+  // Thumb: NT thumbs + (NT-1) gaps = availH
+  // thumb_h = (availH - TGAP*(NT-1)) / NT
+  // thumb_w = thumb_h * 16/9
+  const thumbH = (availH - TGAP*(NT-1)) / NT;
+  const thumbW = thumbH * 16/9;
 
-      // Aplicar ao player
-      const playerEl = document.getElementById('heroPlayer');
-      const playerBox = document.getElementById('heroPlayerBox');
-      playerEl.style.width = finalPlayerW + 'px';
-      playerBox.style.width = finalPlayerW + 'px';
-      playerBox.style.height = finalPlayerH + 'px';
+  // Player: altura = availH, largura = availH * 16/9
+  const playerH = availH;
+  const playerW = availH * 16/9;
 
-      // Aplicar às thumbs
-      const thumbsEl = document.getElementById('heroThumbs');
-      thumbsEl.style.width = finalThumbW + 'px';
-      document.querySelectorAll('.hero-thumb').forEach(t => {
-        t.style.width = finalThumbW + 'px';
-        t.style.height = finalThumbH + 'px';
-      });
+  // Texto: espaço que sobra (limitado ao max-width)
+  const masterW  = Math.min(winW - 104, MAX_W); // 104 = 52px*2 padding
+  const textW    = Math.max(180, masterW - playerW - thumbW - GAP*2);
 
-      // Centralizar master verticalmente
-      const master = document.getElementById('heroMaster');
-      const masterH = finalPlayerH; // altura real do bloco
-      const topOffset = NAV_H + Math.max(PAD_V, (winH - NAV_H - masterH) / 2);
-      master.style.marginTop = (topOffset - NAV_H) + 'px';
+  // Fonte do nome: proporcional à altura, cap 80px
+  const fontSize = Math.min(availH * 0.195, 80);
 
-      // Fonte do nome: proporcional à altura disponível, cap em 80px
-      const fontSize = Math.min(finalPlayerH * 0.22, 80);
-      document.getElementById('heroName').style.fontSize = fontSize + 'px';
-    }
+  // Aplicar
+  const hText = document.getElementById('hText');
+  hText.style.width = textW + 'px';
 
-    layoutHero();
-    window.addEventListener('resize', layoutHero);
+  const hPlayer = document.getElementById('hPlayer');
+  const hBox    = document.getElementById('hBox');
+  hPlayer.style.width  = playerW + 'px';
+  hBox.style.width     = playerW + 'px';
+  hBox.style.height    = playerH + 'px';
 
-    // Carousel
-    const iframe = document.getElementById('heroIframe');
-    document.querySelectorAll('.hero-thumb').forEach(thumb => {
-      thumb.addEventListener('click', () => {
-        document.querySelectorAll('.hero-thumb').forEach(t => t.classList.remove('active'));
-        thumb.classList.add('active');
-        iframe.src = thumb.dataset.src;
-      });
-    });
-  </script>
+  const hThumbs = document.getElementById('hThumbs');
+  hThumbs.style.width = thumbW + 'px';
+  document.querySelectorAll('.h-thumb').forEach(t=>{
+    t.style.width  = thumbW + 'px';
+    t.style.height = thumbH + 'px';
+  });
+
+  document.getElementById('hName').style.fontSize = fontSize + 'px';
+
+  // Centralizar master verticalmente
+  const master  = document.getElementById('hMaster');
+  const topPush = Math.max(PV, (winH - NAV - availH) / 2);
+  master.style.marginTop = (NAV + topPush - NAV) + 'px';
+}
+
+layoutHero();
+window.addEventListener('resize', layoutHero);
+
+// ── Thumbnail carousel ──
+const iframe = document.getElementById('hIframe');
+document.querySelectorAll('.h-thumb').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.h-thumb').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    iframe.src = t.dataset.src;
+  });
+});
+</script>
 </body>
 </html>

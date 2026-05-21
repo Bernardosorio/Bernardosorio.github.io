@@ -117,6 +117,8 @@
     .h-text {
       flex-shrink: 0;
       display: flex; flex-direction: column; justify-content: flex-start;
+      overflow: hidden;
+      min-width: 0;
     }
     .h-eyebrow {
       font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase;
@@ -128,6 +130,8 @@
       line-height: .88; letter-spacing: .01em;
       color: var(--text);
       opacity: 0; animation: riseUp .6s .2s forwards;
+      white-space: nowrap;
+      overflow: hidden;
     }
     .h-name span { color: var(--gold); display: block; }
     .h-rule {
@@ -520,26 +524,40 @@ function layoutHero(){
   // Altura disponível para o hero content
   const availH = winH - NAV - PV * 2;
 
-  // Thumb: NT thumbs + (NT-1) gaps = availH
-  // thumb_h = (availH - TGAP*(NT-1)) / NT
-  // thumb_w = thumb_h * 16/9
-  const thumbH = (availH - TGAP*(NT-1)) / NT;
-  const thumbW = thumbH * 16/9;
+  // Total width available inside master
+  const masterW = Math.min(winW - 104, MAX_W);
 
-  // Player: altura = availH, largura = availH * 16/9
-  const playerH = availH;
-  const playerW = availH * 16/9;
+  // Text col is fixed at 220px
+  const textW = 220;
 
-  // Texto: espaço que sobra (limitado ao max-width)
-  const masterW  = Math.min(winW - 104, MAX_W); // 104 = 52px*2 padding
-  const textW    = Math.max(180, masterW - playerW - thumbW - GAP*2);
+  // Remaining width for player + thumbs
+  const remainW = masterW - textW - GAP * 2;
 
-  // Fonte do nome: proporcional à altura, cap 80px
-  const fontSize = Math.min(availH * 0.195, 80);
+  // thumb_w: sized so 4 thumbs fit the player height
+  // Let player height = H, player width = H*16/9
+  // thumb_h = (H - TGAP*(NT-1)) / NT,  thumb_w = thumb_h * 16/9
+  // remainW = playerW + thumbW + GAP = H*16/9 + ((H - TGAP*(NT-1))/NT)*16/9 + GAP
+  // Solve for H:
+  // remainW - GAP = (16/9) * (H + (H - TGAP*(NT-1))/NT)
+  // remainW - GAP = (16/9) * H * (1 + 1/NT) - (16/9)*(TGAP*(NT-1)/NT)
+  const ratio = 16/9;
+  const H = (remainW - GAP + ratio * TGAP*(NT-1)/NT) / (ratio * (1 + 1/NT));
+
+  // Cap H to availH so nothing overflows vertically
+  const playerH = Math.min(H, availH);
+  const playerW = playerH * 16/9;
+  const thumbH  = (playerH - TGAP*(NT-1)) / NT;
+  const thumbW  = thumbH * 16/9;
+
+  // Fonte do nome: calculada para caber em 220px de largura
+  // "RODRIGUES" tem 9 chars; Bebas Neue ~0.62 de ratio char/height
+  const longestChars = 9;
+  const fontSize = Math.min(Math.floor(220 / (longestChars * 0.62)), 76);
 
   // Aplicar
   const hText = document.getElementById('hText');
-  hText.style.width = textW + 'px';
+  hText.style.width = '220px';
+  hText.style.overflow = 'hidden';
 
   const hPlayer = document.getElementById('hPlayer');
   const hBox    = document.getElementById('hBox');

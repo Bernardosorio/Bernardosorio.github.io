@@ -65,13 +65,13 @@
 }
 .sobre__text {
   font-size: 15px; line-height: 1.9; color: var(--sobre-muted);
-  margin: 20px 0 0; max-width: 62ch;
+  margin: 20px 0 0; max-width: 75ch;
 }
 .sobre__highlight { color: var(--sobre-gold); }
 
 .sobre__personal {
   display: flex; align-items: center; gap: 12px; margin: 28px 0 0;
-  font-size: 13px; color: var(--sobre-muted); line-height: 1.5;
+  font-size: 15px; color: var(--sobre-muted); line-height: 1.5;
 }
 .sobre__personal svg { flex-shrink: 0; color: var(--sobre-gold); }
 
@@ -79,19 +79,18 @@
   list-style: none; display: flex; margin: 44px 0 0; padding: 0;
 }
 .sobre__stat {
-  flex: 1; padding: 0 20px; border-left: 1px solid var(--sobre-border);
+  flex: 1; padding: 0 12px; border-left: 1px solid var(--sobre-border);
   display: flex; flex-direction: column; align-items: center; text-align: center;
   justify-content: flex-end; gap: 10px;
 }
 .sobre__stat:first-child { padding-left: 0; border-left: none; }
-.sobre__stat svg { width: 30px; height: 30px; color: var(--sobre-gold); }
 .sobre__stat-n {
-  font-family: 'Bebas Neue', sans-serif; font-size: 34px; color: var(--sobre-gold); line-height: 1;
+  font-family: 'Bebas Neue', sans-serif; font-size: 80px; color: var(--sobre-gold); line-height: 1;
 }
-.sobre__stat-n--symbol { font-size: 52px; }
+.sobre__stat-n--symbol { font-size: 102px; display: inline-block; transform: translateY(11px); }
 .sobre__stat-l {
-  font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--sobre-muted); margin-top: 2px;
+  font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--sobre-muted); margin-top: 1px;
 }
 
 .sobre__cta {

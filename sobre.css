@@ -63,6 +63,7 @@
   font-size: clamp(40px, 5vw, 68px); line-height: 1; letter-spacing: .03em;
   color: var(--sobre-text); margin: 0;
 }
+.sobre__rule { width: 32px; height: 2px; background: var(--sobre-gold); margin: 18px 0; }
 .sobre__text {
   font-size: 15px; line-height: 1.9; color: var(--sobre-muted);
   margin: 20px 0 0; max-width: 75ch;
@@ -181,20 +182,56 @@
 .sobre__line--2 { --top: 85%; --left: 66%; --len: 400px; --rot: -44deg; }
 .sobre__line--3 { --top: 88%; --left: 88%; --len: 200px; --rot: -44deg; }
 
+/* ── Client logo marquee ── */
+.sobre__clients {
+  position: relative;
+  z-index: 1;
+  padding: 4px 0;
+  border-top: 1px solid var(--sobre-border);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 25%, #000 75%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 25%, #000 75%, transparent);
+}
+.sobre__clients-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: sobreClientsScroll 28s linear infinite;
+}
+.sobre__client {
+  flex-shrink: 0;
+  height: 126px; width: auto;
+  margin: 0 2px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: .55;
+  transition: opacity .2s;
+}
+.sobre__client:hover { opacity: 1; }
+
+@keyframes sobreClientsScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sobre__content, .sobre__visual { transition-duration: .01ms; }
+  .sobre__clients-track { animation: none; }
 }
 
 /* ── Responsive ── */
 @media (max-width: 840px) {
   .sobre { padding-top: 88px; }
   .sobre__wrap { grid-template-columns: 1fr; gap: 48px; padding: 0 20px; }
+  .sobre__clients { padding: 24px 0; }
+  .sobre__client { height: 32px; margin: 0 28px; }
   .sobre__stats { flex-wrap: wrap; row-gap: 26px; }
   .sobre__stat { flex: 0 0 50%; border-left: none; padding: 0; }
   .sobre__visual { aspect-ratio: 4/3; }
-  .sobre__halo { top: 53%; width: 65%; }
-  .sobre__glow { top: 53%; width: 48%; }
-  .sobre__line--1 { --top: 60%; --left: 98%; --len: 160px; }
-  .sobre__line--2 { --top: 68%; --left: 88%; --len: 140px; }
-  .sobre__line--3 { --top: 56%; --left: 80%; --len: 125px; }
+  .sobre__halo { top: 68%; width: 65%; }
+  .sobre__glow { top: 68%; width: 48%; }
+  .sobre__line--1 { --top: 66%; --left: 73%; --len: 90px; }
+  .sobre__line--2 { --top: 88%; --left: 69%; --len: 90px; }
+  .sobre__line--3 { --top: 76%; --left: 79%; --len: 70px; }
+  .sobre__dots { top: 0; right: -11px; width: 64px; height: 64px; background-size: 10px 10px; }
 }

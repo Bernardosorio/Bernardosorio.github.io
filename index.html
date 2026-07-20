@@ -48,6 +48,10 @@
       transform: translate(-50%,-50%);
       transition: width .2s, height .2s;
     }
+    @media (hover: none), (pointer: coarse) {
+      #cur, #curR { display: none; }
+      body { cursor: auto; }
+    }
 
     /* ── NAV ── */
     #nav {
@@ -81,23 +85,17 @@
     }
     .nav-links a:hover { color: var(--gold); }
 
-    /* ── HERO ── */
+    /* ── SHOWCASE (Hero + Projetos unificados) ── */
     #hero {
-      height: 100vh; min-height: 600px;
-      display: flex; align-items: center; justify-content: center;
-      padding: 0 52px;
       position: relative; overflow: hidden;
+      padding: 150px 0 60px;
     }
-
-    /* Grain overlay */
     #hero::before {
       content: '';
       position: absolute; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
       background-size: 180px; opacity: .028; pointer-events: none; z-index: 0;
     }
-
-    /* Ambient glow */
     .glow {
       position: absolute; pointer-events: none; z-index: 0;
       border-radius: 50%; filter: blur(120px); opacity: .18;
@@ -105,48 +103,27 @@
     .glow-a { width: 700px; height: 500px; background: var(--gold); top: -100px; right: 20%; }
     .glow-b { width: 400px; height: 400px; background: #a06020; bottom: 0; left: 10%; opacity: .1; }
 
-    /* Master row */
-    .h-master {
-      position: relative; z-index: 1;
-      display: flex; flex-direction: row;
-      align-items: flex-start;
-      gap: 24px;
-      width: 100%; max-width: 1440px;
-    }
-
-    /* ── TEXT COL ── */
-    .h-text {
-      flex-shrink: 0;
-      display: flex; flex-direction: column; justify-content: flex-start;
-      overflow: hidden;
-      min-width: 0;
-    }
-    .h-eyebrow {
+    .showcase-intro { position: relative; z-index: 1; }
+    .show-eyebrow {
       font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase;
-      color: var(--gold); margin-bottom: 14px;
+      color: var(--gold); margin-bottom: 16px;
       opacity: 0; animation: riseUp .6s .1s forwards;
     }
-    .h-name {
+    .show-name {
       font-family: 'Bebas Neue', sans-serif;
-      line-height: .88; letter-spacing: .01em;
+      font-size: clamp(48px, 8vw, 128px); line-height: .88; letter-spacing: .01em;
       color: var(--text);
       opacity: 0; animation: riseUp .6s .2s forwards;
-      white-space: nowrap;
-      overflow: hidden;
     }
-    .h-name span { color: var(--gold); display: block; }
-    .h-rule {
-      width: 32px; height: 2px; background: var(--gold);
-      margin: 18px 0;
+    .show-name span { color: var(--gold); }
+    .show-desc {
+      font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 540px;
+      margin-top: 22px;
       opacity: 0; animation: riseUp .6s .35s forwards;
     }
-    .h-desc {
-      font-size: 13px; line-height: 1.75; color: var(--muted);
-      opacity: 0; animation: riseUp .6s .45s forwards;
-    }
-    .h-cta {
-      margin-top: 28px; display: flex; flex-wrap: wrap; gap: 12px 14px; align-items: center;
-      opacity: 0; animation: riseUp .6s .6s forwards;
+    .show-cta {
+      margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px 14px; align-items: center;
+      opacity: 0; animation: riseUp .6s .5s forwards;
     }
     .btn-fill {
       display: inline-flex; align-items: center; gap: 9px;
@@ -166,79 +143,30 @@
     }
     .btn-line:hover { color: var(--gold); border-color: var(--gold); }
 
-    /* ── PLAYER COL ── */
-    .h-player { flex-shrink: 0; display: flex; flex-direction: column; }
-    .h-player-box {
-      position: relative; background: var(--bg3); overflow: hidden;
-      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+    .showcase-top {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: .85fr 1.3fr; gap: 36px; align-items: center;
     }
-    .h-player-box iframe {
-      position: absolute; inset: 0; width: 100%; height: 100%; border: none;
-    }
-    /* Thin gold border top */
-    .h-player-box::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 2px; background: var(--gold); z-index: 2;
-    }
-
-    /* ── THUMBS COL ── */
-    .h-thumbs { flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; }
-    .h-thumb {
-      flex-shrink: 0; position: relative; overflow: hidden;
-      border: 1px solid rgba(255,255,255,.06);
-      transition: border-color .2s, transform .2s;
-      cursor: none;
-    }
-    .h-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
-    .h-thumb:hover { border-color: var(--gold); transform: translateX(-3px); }
-    .h-thumb:hover img { transform: scale(1.06); }
-    .h-thumb.active { border-color: var(--gold); }
-    .h-thumb.active::after {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-      width: 3px; background: var(--gold); z-index: 2;
-    }
-    .h-thumb-ov {
-      position: absolute; inset: 0;
-      background: rgba(0,0,0,.35);
+    .showcase-reel { aspect-ratio: 16/9; }
+    .reel-play {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      width: 74px; height: 74px; border-radius: 50%;
+      background: rgba(8,8,8,.55); border: 1px solid rgba(255,255,255,.25);
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .2s;
+      color: var(--gold); backdrop-filter: blur(4px);
+      transition: transform .2s, background .2s;
     }
-    .h-thumb:hover .h-thumb-ov { opacity: 1; }
-    .h-thumb-ov span {
-      width: 24px; height: 24px; background: var(--gold); border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    /* Scroll cue */
-    .scroll-cue {
-      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      opacity: 0; animation: fadeIn 1s 1.4s forwards;
-    }
-    .scroll-cue span { font-size: 9px; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); }
-    .scroll-cue-line {
-      width: 1px; height: 44px;
-      background: linear-gradient(to bottom, var(--gold), transparent);
-      animation: pulse 2s ease-in-out infinite;
-    }
+    .showcase-reel:hover .reel-play { transform: translate(-50%,-50%) scale(1.08); background: rgba(8,8,8,.75); }
+    .showcase-grid { position: relative; z-index: 1; margin-top: 90px; scroll-margin-top: 90px; }
 
     /* ── SECTIONS ── */
     .wrap { max-width: 1440px; margin: 0 auto; padding: 0 52px; }
 
     /* Projects */
-    #projetos { padding: 120px 0; }
     .sec-label { font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-    .sec-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(40px, 5vw, 68px); letter-spacing: .03em; color: var(--text);
-      margin-bottom: 40px;
-    }
-    .proj-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+    .proj-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; margin-top: 24px; }
     .proj-card { display: block; position: relative; aspect-ratio: 16/9; background: var(--bg3); overflow: hidden; cursor: none; text-decoration: none; }
-    .proj-card.feat { grid-column: span 2; }
     .proj-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
-    .proj-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
-    .proj-ph-icon { font-size: 26px; opacity: .1; }
     .proj-info {
       position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
       padding: 18px; background: linear-gradient(to top, rgba(0,0,0,.85) 0%, transparent 55%);
@@ -314,19 +242,13 @@
     @media (max-width: 840px) {
       #nav { padding: 0 20px; }
       .nav-links { gap: 18px; }
-      #hero { padding: 80px 20px 40px; align-items: flex-start; height: auto; min-height: 100vh; }
-      .h-master { flex-direction: column; }
-      .h-text { width: 100% !important; }
-      .h-player { width: 100% !important; }
-      .h-player-box { width: 100% !important; height: 0 !important; padding-bottom: 56.25%; position: relative; }
-      .h-thumbs { flex-direction: row !important; width: 100% !important; }
-      .h-thumb { flex: 1 !important; width: auto !important; height: auto !important; aspect-ratio: 16/9; }
-      .scroll-cue { display: none; }
-      #projetos, #contato { padding: 80px 0; }
+      #hero { padding: 110px 0 40px; }
+      .showcase-top { grid-template-columns: 1fr; gap: 32px; }
+      .showcase-grid { margin-top: 56px; }
+      #contato { padding: 80px 0; }
       .wrap { padding: 0 20px; }
       #contato .wrap { grid-template-columns: 1fr; gap: 40px; }
       .proj-grid { grid-template-columns: 1fr; }
-      .proj-card.feat { grid-column: span 1; }
       footer { flex-direction: column; gap: 8px; text-align: center; padding: 20px; }
     }
   </style>
@@ -348,88 +270,51 @@
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- SHOWCASE (Hero + Projetos) -->
 <section id="hero">
   <div class="glow glow-a"></div>
   <div class="glow glow-b"></div>
 
-  <div class="h-master" id="hMaster">
-
-    <!-- Texto -->
-    <div class="h-text" id="hText">
-      <p class="h-eyebrow">Motion Designer &amp;&nbsp;Editor&nbsp;de&nbsp;Vídeo</p>
-      <h1 class="h-name" id="hName">BERNARDO<span>RODRIGUES</span></h1>
-      <div class="h-rule"></div>
-      <p class="h-desc">Motion Design, Edição de Vídeo e IA para transformar ideias em experiências visuais de alto impacto.</p>
-      <div class="h-cta">
-        <a href="#projetos" class="btn-fill">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
-          Ver Projetos
-        </a>
-        <a href="#contato" class="btn-line">Falar comigo</a>
-      </div>
-    </div>
-
-    <!-- Player principal -->
-    <div class="h-player" id="hPlayer">
-      <div class="h-player-box" id="hBox">
-        <iframe id="hIframe"
-          src="https://player.vimeo.com/video/939807681?autoplay=0&title=0&byline=0&portrait=0&color=E8B84B"
-          allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-      </div>
-    </div>
-
-    <!-- Miniaturas -->
-    <div class="h-thumbs" id="hThumbs">
-
-      <div class="h-thumb active"
-        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
-        <img src="MTC-CAPA.gif" alt="Motion Reel"/>
-        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
-      </div>
-
-      <div class="h-thumb"
-        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
-        <img src="new-normal-capa.gif" alt="New Normal"/>
-        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
-      </div>
-
-      <div class="h-thumb"
-        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
-        <img src="Zappo-CAPA.gif" alt="Zappo Delivery"/>
-        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
-      </div>
-
-      <div class="h-thumb"
-        data-src="https://player.vimeo.com/video/939807681?autoplay=1&title=0&byline=0&portrait=0&color=E8B84B">
-        <img src="MTC-CAPA.gif" alt="Projeto 4"/>
-        <div class="h-thumb-ov"><span><svg width="8" height="8" viewBox="0 0 24 24" fill="#080808"><polygon points="5,3 19,12 5,21"/></svg></span></div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="scroll-cue">
-    <div class="scroll-cue-line"></div>
-    <span>scroll</span>
-  </div>
-</section>
-
-<!-- PROJETOS -->
-<section id="projetos">
   <div class="wrap">
-    <p class="sec-label rv">Trabalhos</p>
-    <h2 class="sec-title rv d1">PROJETOS<br>SELECIONADOS</h2>
-    <div class="proj-grid">
-      <a href="https://vimeo.com/1177357362/6fad262126" data-vimeo-id="1177357362" data-vimeo-h="6fad262126" class="proj-card feat rv" aria-label="Assistir MJV Digital Pods no Vimeo">
-        <img src="mjv-digital-pods-capa.jpg" alt="MJV Digital Pods" loading="lazy"/>
-        <div class="proj-ph"><span class="proj-ph-icon">▶</span></div>
-        <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">MJV Digital Pods</h3></div>
+    <div class="showcase-top">
+      <div class="showcase-intro">
+        <p class="show-eyebrow">Motion Designer &amp;&nbsp;Editor&nbsp;de&nbsp;Vídeo</p>
+        <h1 class="show-name">BERNARDO <span>RODRIGUES</span></h1>
+        <p class="show-desc">Motion Design, Edição de Vídeo e IA para transformar ideias em experiências visuais de alto impacto.</p>
+        <div class="show-cta">
+          <a href="#projetos" class="btn-fill">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+            Ver Projetos
+          </a>
+          <a href="#contato" class="btn-line">Falar comigo</a>
+        </div>
+      </div>
+
+      <a href="https://vimeo.com/939807681" data-vimeo-id="939807681" class="proj-card showcase-reel" aria-label="Assistir Motion Reel">
+        <img src="motion-reel-capa.jpg" alt="Motion Reel"/>
+        <span class="reel-play" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        </span>
+        <div class="proj-info"><p class="proj-cat">Reel</p><h3 class="proj-name">Motion Reel</h3></div>
       </a>
-      <div class="proj-card rv d1"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Edição</p><h3 class="proj-name">Projeto 02</h3></div></div>
-      <div class="proj-card rv d1"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Animação</p><h3 class="proj-name">Projeto 03</h3></div></div>
-      <div class="proj-card rv d2"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Projeto 04</h3></div></div>
-      <div class="proj-card rv d2"><div class="proj-ph"><span class="proj-ph-icon">▶</span></div><div class="proj-info"><p class="proj-cat">Branding</p><h3 class="proj-name">Projeto 05</h3></div></div>
+    </div>
+
+    <div class="showcase-grid" id="projetos">
+      <p class="sec-label rv">Trabalhos</p>
+      <div class="proj-grid">
+        <a href="https://vimeo.com/490024459" data-vimeo-id="490024459" class="proj-card rv" aria-label="Assistir Lenga Lenga">
+          <img src="Lenga%20Lenga.gif" alt="Lenga Lenga"/>
+          <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Lenga Lenga</h3></div>
+        </a>
+        <a href="https://vimeo.com/939807681" data-vimeo-id="939807681" class="proj-card rv d1" aria-label="Assistir Zappo Delivery">
+          <img src="Zappo-CAPA.gif" alt="Zappo Delivery"/>
+          <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Zappo Delivery</h3></div>
+        </a>
+        <a href="https://vimeo.com/1177357362/6fad262126" data-vimeo-id="1177357362" data-vimeo-h="6fad262126" class="proj-card rv d2" aria-label="Assistir MJV Digital Pods no Vimeo">
+          <img src="Digitalpods_.gif" alt="MJV Digital Pods" loading="lazy"/>
+          <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">MJV Digital Pods</h3></div>
+        </a>
+      </div>
     </div>
   </div>
 
@@ -452,8 +337,8 @@
     <div class="sobre__content">
       <p class="sobre__eyebrow">Sobre</p>
       <h2 class="sobre__title">QUEM<br>SOU EU</h2>
-      <div class="h-rule"></div>
-      <p class="sobre__text">Motion Designer e Editor de Vídeo com mais de <span class="sobre__highlight">15 anos de experiência</span> em produção audiovisual. Realizei projetos para grandes marcas como <span class="sobre__highlight">Bradesco Seguros, Coca-Cola, Claro, Unilever, L'Oréal, Electrolux e GSK.</span> Hoje lidero a produção audiovisual na MJV, unindo criatividade, automação e IA generativa no dia a dia para entregar mais qualidade em menos tempo.</p>
+      <div class="sobre__rule"></div>
+      <p class="sobre__text">Motion Designer e Editor de Vídeo com mais de <span class="sobre__highlight">15 anos de experiência</span> em produção audiovisual. Na MJV realizei projetos para grandes marcas como <span class="sobre__highlight">Bradesco Seguros, Coca-Cola, Claro, Unilever, L'Oréal, Electrolux e GSK.</span> Hoje lidero a produção audiovisual na MJV, unindo criatividade, automação e IA generativa no dia a dia para entregar mais qualidade em menos tempo.</p>
       <p class="sobre__personal">
         <svg width="26" height="26" viewBox="0 0 122.88 79.92" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M23.35,72.21c4.04-4.11,8.82-8.28,12.37-13.68h51.43c3.56,5.39,8.34,9.57,12.37,13.68 c30.95,31.52,28.87-42.32,7-64.5h-1.68C102.09,3.11,96.72,0,90.55,0c-6.17,0-11.53,3.11-14.28,7.71H46.61 C43.86,3.11,38.49,0,32.32,0c-6.17,0-11.53,3.11-14.29,7.71h-1.68C-5.52,29.89-7.6,103.72,23.35,72.21L23.35,72.21z M29.85,12.84 h11.11v8.85l8.85,0V32.8h-8.85v8.85H29.85V32.8H21V21.69h8.85L29.85,12.84L29.85,12.84L29.85,12.84z M83.16,36.9 c2.69,0,4.87,2.18,4.87,4.87c0,2.69-2.18,4.88-4.87,4.88s-4.87-2.18-4.87-4.88C78.29,39.08,80.47,36.9,83.16,36.9L83.16,36.9z M85.82,15.21c3.9,0,7.06,3.16,7.06,7.05c0,3.9-3.16,7.05-7.06,7.05c-3.9,0-7.05-3.16-7.05-7.05 C78.77,18.37,81.92,15.21,85.82,15.21L85.82,15.21z M104.04,26.11c2.69,0,4.87,2.18,4.87,4.87c0,2.69-2.18,4.87-4.87,4.87 c-2.69,0-4.88-2.18-4.88-4.87C99.16,28.29,101.35,26.11,104.04,26.11L104.04,26.11z"/></svg>
         <span>Um cara tranquilo, com muitos jogos para zerar.</span>
@@ -497,6 +382,23 @@
       </div>
     </div>
 
+  </div>
+
+  <div class="sobre__clients" aria-label="Marcas com quem já trabalhei">
+    <div class="sobre__clients-track">
+      <img class="sobre__client" src="clientes/mjv-clientes-24-1.png" alt="Bradesco"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-12-1.png" alt="Coca-Cola"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-11.png" alt="SulAmérica"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-13.png" alt="BNP Paribas"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-15.png" alt="Panasonic"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-23-1.png" alt="LafargeHolcim"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-24-1.png" alt="Bradesco" aria-hidden="true"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-12-1.png" alt="" aria-hidden="true"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-11.png" alt="" aria-hidden="true"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-13.png" alt="" aria-hidden="true"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-15.png" alt="" aria-hidden="true"/>
+      <img class="sobre__client" src="clientes/mjv-clientes-23-1.png" alt="" aria-hidden="true"/>
+    </div>
   </div>
 </section>
 
@@ -547,97 +449,6 @@ window.addEventListener('scroll',()=>document.getElementById('nav').classList.to
 // ── Reveal ──
 const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:.08});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
-
-// ── HERO LAYOUT ENGINE ──
-// Tudo calculado a partir da altura disponível real.
-// Player altura = availH → largura = availH * 16/9
-// Thumbs: 4 thumbs + 3 gaps enchem availH
-// Texto: largura restante
-function layoutHero(){
-  const isMobile = window.innerWidth <= 840;
-  if(isMobile) return;
-
-  const NAV   = 64;   // altura nav
-  const PV    = 48;   // padding vertical (top+bottom cada)
-  const GAP   = 24;   // gap entre colunas
-  const TGAP  = 8;    // gap entre thumbs
-  const NT    = 4;    // número de thumbs
-  const MAX_W = 1440; // max-width do master
-
-  const winH  = window.innerHeight;
-  const winW  = window.innerWidth;
-
-  // Altura disponível para o hero content
-  const availH = winH - NAV - PV * 2;
-
-  // Total width available inside master
-  const masterW = Math.min(winW - 104, MAX_W);
-
-  // Text col is fixed at 220px
-  const textW = 220;
-
-  // Remaining width for player + thumbs
-  const remainW = masterW - textW - GAP * 2;
-
-  // thumb_w: sized so 4 thumbs fit the player height
-  // Let player height = H, player width = H*16/9
-  // thumb_h = (H - TGAP*(NT-1)) / NT,  thumb_w = thumb_h * 16/9
-  // remainW = playerW + thumbW + GAP = H*16/9 + ((H - TGAP*(NT-1))/NT)*16/9 + GAP
-  // Solve for H:
-  // remainW - GAP = (16/9) * (H + (H - TGAP*(NT-1))/NT)
-  // remainW - GAP = (16/9) * H * (1 + 1/NT) - (16/9)*(TGAP*(NT-1)/NT)
-  const ratio = 16/9;
-  const H = (remainW - GAP + ratio * TGAP*(NT-1)/NT) / (ratio * (1 + 1/NT));
-
-  // Cap H to availH so nothing overflows vertically
-  const playerH = Math.min(H, availH);
-  const playerW = playerH * 16/9;
-  const thumbH  = (playerH - TGAP*(NT-1)) / NT;
-  const thumbW  = thumbH * 16/9;
-
-  // Fonte do nome: calculada para preencher os 220px de largura da coluna
-  // "RODRIGUES" tem 9 chars; Bebas Neue (condensada) ~0.42 de ratio char/height
-  const longestChars = 9;
-  const fontSize = Math.min(Math.floor(textW / (longestChars * 0.42)), 76);
-
-  // Aplicar
-  const hText = document.getElementById('hText');
-  hText.style.width = '220px';
-  hText.style.overflow = 'hidden';
-
-  const hPlayer = document.getElementById('hPlayer');
-  const hBox    = document.getElementById('hBox');
-  hPlayer.style.width  = playerW + 'px';
-  hBox.style.width     = playerW + 'px';
-  hBox.style.height    = playerH + 'px';
-
-  const hThumbs = document.getElementById('hThumbs');
-  hThumbs.style.width = thumbW + 'px';
-  document.querySelectorAll('.h-thumb').forEach(t=>{
-    t.style.width  = thumbW + 'px';
-    t.style.height = thumbH + 'px';
-  });
-
-  document.getElementById('hName').style.fontSize = fontSize + 'px';
-
-  // Centralizar master verticalmente
-  const master  = document.getElementById('hMaster');
-  const topPush = Math.max(PV, (winH - NAV - availH) / 2);
-  master.style.marginTop = (NAV + topPush - NAV) + 'px';
-}
-
-layoutHero();
-window.addEventListener('resize', layoutHero);
-
-// ── Thumbnail carousel ──
-const iframe = document.getElementById('hIframe');
-document.querySelectorAll('.h-thumb').forEach(t=>{
-  t.addEventListener('click', ()=>{
-    document.querySelectorAll('.h-thumb').forEach(x=>x.classList.remove('active'));
-    t.classList.add('active');
-    iframe.src = t.dataset.src;
-  });
-});
 
 // ── Project modal (lightbox) ──
 const projModal = document.getElementById('projModal');

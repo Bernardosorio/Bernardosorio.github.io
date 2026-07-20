@@ -166,14 +166,14 @@
     .sec-label { font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
     .proj-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; margin-top: 24px; }
     .proj-card { display: block; position: relative; aspect-ratio: 16/9; background: var(--bg3); overflow: hidden; cursor: none; text-decoration: none; }
-    .proj-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+    .proj-card img, .proj-card video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
     .proj-info {
       position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end;
       padding: 18px; background: linear-gradient(to top, rgba(0,0,0,.85) 0%, transparent 55%);
       opacity: 0; transition: opacity .3s;
     }
     .proj-card:hover .proj-info { opacity: 1; }
-    .proj-card:hover img { transform: scale(1.04); }
+    .proj-card:hover img, .proj-card:hover video { transform: scale(1.04); }
     .proj-cat { font-size: 9.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-bottom: 3px; }
     .proj-name { font-family: 'Bebas Neue', sans-serif; font-size: 17px; color: #fff; }
 
@@ -303,15 +303,21 @@
       <p class="sec-label rv">Trabalhos</p>
       <div class="proj-grid">
         <a href="https://vimeo.com/490024459" data-vimeo-id="490024459" class="proj-card rv" aria-label="Assistir Lenga Lenga">
-          <img src="Lenga%20Lenga.gif" alt="Lenga Lenga"/>
+          <video autoplay muted loop playsinline preload="auto" aria-label="Lenga Lenga">
+            <source src="Lenga%20Lenga-%20Atila%20Hoje.mp4" type="video/mp4"/>
+          </video>
           <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Lenga Lenga</h3></div>
         </a>
-        <a href="https://vimeo.com/939807681" data-vimeo-id="939807681" class="proj-card rv d1" aria-label="Assistir Zappo Delivery">
-          <img src="Zappo-CAPA.gif" alt="Zappo Delivery"/>
-          <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">Zappo Delivery</h3></div>
+        <a href="https://vimeo.com/1180969529/917be11432" data-vimeo-id="1180969529" data-vimeo-h="917be11432" class="proj-card rv d1" aria-label="Assistir MJV Horizon">
+          <video autoplay muted loop playsinline preload="auto" poster="mjv-horizon-capa.jpg" aria-label="MJV Horizon">
+            <source src="Banner%20Site.mp4" type="video/mp4"/>
+          </video>
+          <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">MJV Horizon</h3></div>
         </a>
         <a href="https://vimeo.com/1177357362/6fad262126" data-vimeo-id="1177357362" data-vimeo-h="6fad262126" class="proj-card rv d2" aria-label="Assistir MJV Digital Pods no Vimeo">
-          <img src="Digitalpods_.gif" alt="MJV Digital Pods" loading="lazy"/>
+          <video autoplay muted loop playsinline preload="auto" poster="mjv-digital-pods-capa.jpg" aria-label="MJV Digital Pods">
+            <source src="digitalpods.mp4" type="video/mp4"/>
+          </video>
           <div class="proj-info"><p class="proj-cat">Motion Design</p><h3 class="proj-name">MJV Digital Pods</h3></div>
         </a>
       </div>

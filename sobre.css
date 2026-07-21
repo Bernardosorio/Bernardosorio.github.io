@@ -226,8 +226,8 @@
   .sobre { padding-top: 88px; }
   .sobre__wrap { grid-template-columns: 1fr; gap: 48px; padding: 0 20px; }
   .sobre__clients { padding: 24px 0; }
-  .sobre__client { height: 46px; margin: 0 22px; }
-  .sobre__client--compact { height: 28px; }
+  .sobre__client { height: 80px; margin: 0 22px; }
+  .sobre__client--compact { height: 49px; }
   .sobre__stats { flex-wrap: wrap; row-gap: 26px; }
   .sobre__stat { flex: 0 0 50%; border-left: none; padding: 0; }
   .sobre__visual { aspect-ratio: 4/3; }

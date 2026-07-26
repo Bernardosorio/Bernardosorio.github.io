@@ -49,7 +49,7 @@
 .sobre__visual {
   opacity: 0;
   transform: translateY(24px);
-  transition: opacity .45s ease, transform .45s ease;
+  transition: opacity .45s var(--sobre-ease), transform .45s var(--sobre-ease);
 }
 .sobre.is-visible .sobre__content { opacity: 1; transform: none; }
 .sobre.is-visible .sobre__visual { opacity: 1; transform: none; transition-delay: .1s; }

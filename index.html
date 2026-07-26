@@ -24,6 +24,11 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
     body {
       background: var(--bg);
       color: var(--text);
@@ -38,7 +43,6 @@
       position: fixed; top: 0; left: 0; width: 8px; height: 8px;
       background: var(--gold); border-radius: 50%;
       pointer-events: none; z-index: 9999;
-      transition: width .15s var(--ease-out), height .15s var(--ease-out);
       mix-blend-mode: difference;
       will-change: transform;
     }
@@ -46,7 +50,6 @@
       position: fixed; top: 0; left: 0; width: 32px; height: 32px;
       border: 1px solid rgba(232,184,75,.4); border-radius: 50%;
       pointer-events: none; z-index: 9998;
-      transition: width .2s var(--ease-out), height .2s var(--ease-out);
       will-change: transform;
     }
     @media (hover: none), (pointer: coarse) {
@@ -115,23 +118,23 @@
     .show-eyebrow {
       font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase;
       color: var(--gold); margin-bottom: 16px;
-      opacity: 0; animation: riseUp .6s .1s forwards;
+      opacity: 0; animation: riseUp .6s var(--ease-out) .1s forwards;
     }
     .show-name {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(48px, 8vw, 128px); line-height: .88; letter-spacing: .01em;
+      font-size: clamp(48px, 7vw, 96px); line-height: .88; letter-spacing: .01em;
       color: var(--text);
-      opacity: 0; animation: riseUp .6s .2s forwards;
+      opacity: 0; animation: riseUp .6s var(--ease-out) .2s forwards;
     }
     .show-name span { color: var(--gold); }
     .show-desc {
       font-size: 15px; line-height: 1.7; color: var(--muted); max-width: 540px;
       margin-top: 22px;
-      opacity: 0; animation: riseUp .6s .35s forwards;
+      opacity: 0; animation: riseUp .6s var(--ease-out) .35s forwards;
     }
     .show-cta {
       margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px 14px; align-items: center;
-      opacity: 0; animation: riseUp .6s .5s forwards;
+      opacity: 0; animation: riseUp .6s var(--ease-out) .5s forwards;
     }
     .btn-fill {
       display: inline-flex; align-items: center; gap: 9px;
@@ -259,7 +262,7 @@
     footer p { font-size: 10.5px; color: var(--muted); letter-spacing: .06em; }
 
     /* ── REVEAL ── */
-    .rv { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .rv { opacity: 0; transform: translateY(28px); transition: opacity .7s var(--ease-out), transform .7s var(--ease-out); }
     .rv.on { opacity: 1; transform: none; }
     .rv.d1 { transition-delay: .1s; } .rv.d2 { transition-delay: .2s; } .rv.d3 { transition-delay: .3s; }
 
@@ -503,16 +506,19 @@ if (!prefersReducedMotion) {
   const cur = document.getElementById('cur');
   const curR = document.getElementById('curR');
   let mx=0,my=0,rx=0,ry=0;
+  let scale=1,scaleR=1,targetScale=1,targetScaleR=1;
   document.addEventListener('mousemove', e=>{mx=e.clientX;my=e.clientY;});
   (function tick(){
-    cur.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%)`;
+    scale += (targetScale-scale)*.25;
+    scaleR += (targetScaleR-scaleR)*.2;
+    cur.style.transform = `translate3d(${mx}px, ${my}px, 0) translate(-50%, -50%) scale(${scale})`;
     rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
-    curR.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
+    curR.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%) scale(${scaleR})`;
     requestAnimationFrame(tick);
   })();
   document.querySelectorAll('a,button').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{cur.style.width='18px';cur.style.height='18px';curR.style.width='52px';curR.style.height='52px';});
-    el.addEventListener('mouseleave',()=>{cur.style.width='8px';cur.style.height='8px';curR.style.width='32px';curR.style.height='32px';});
+    el.addEventListener('mouseenter',()=>{targetScale=2.25;targetScaleR=1.625;});
+    el.addEventListener('mouseleave',()=>{targetScale=1;targetScaleR=1;});
   });
 }
 

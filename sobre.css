@@ -12,6 +12,7 @@
   --sobre-text: #f5f1e8;
   --sobre-muted: rgba(245, 241, 232, .6);
   --sobre-border: rgba(216, 162, 58, .16);
+  --sobre-ease: cubic-bezier(0.23, 1, 0.32, 1);
 
   position: relative;
   background: var(--sobre-bg);
@@ -99,10 +100,11 @@
   color: var(--sobre-text); text-decoration: none;
   font-size: 10px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
   padding: 13px 22px; border: 1px solid var(--sobre-border);
-  transition: border-color .2s, color .2s, background .2s;
+  transition: border-color .2s var(--sobre-ease), color .2s var(--sobre-ease), background .2s var(--sobre-ease), transform .15s var(--sobre-ease);
 }
 .sobre__cta:hover { border-color: var(--sobre-gold); color: var(--sobre-gold); background: rgba(216,162,58,.06); }
-.sobre__cta svg { transition: transform .2s; }
+.sobre__cta:active { transform: scale(.97); }
+.sobre__cta svg { transition: transform .2s var(--sobre-ease); }
 .sobre__cta:hover svg { transform: translateX(3px); }
 
 /* ── Visual column ── */
@@ -206,7 +208,7 @@
   object-fit: contain;
   filter: brightness(0) invert(1);
   opacity: .55;
-  transition: opacity .2s;
+  transition: opacity .2s var(--sobre-ease);
 }
 .sobre__client:hover { opacity: 1; }
 .sobre__client--compact { height: 77px; }
@@ -219,6 +221,7 @@
 @media (prefers-reduced-motion: reduce) {
   .sobre__content, .sobre__visual { transition-duration: .01ms; }
   .sobre__clients-track { animation: none; }
+  .sobre__cta, .sobre__cta svg { transition: none; }
 }
 
 /* ── Responsive ── */

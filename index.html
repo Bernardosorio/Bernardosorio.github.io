@@ -234,34 +234,6 @@
     .soc-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(232,184,75,.06); }
     .soc-btn:active { transform: scale(.92); }
 
-    /* ── FORM ── */
-    .ct-form { display: grid; gap: 22px; margin-bottom: 44px; }
-    .ct-field { display: grid; gap: 6px; }
-    .ct-field label { font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
-    .ct-field input, .ct-field textarea {
-      width: 100%; background: transparent; color: var(--text);
-      font: 300 15px/1.5 'Barlow', sans-serif;
-      border: 0; border-bottom: 1px solid rgba(240,236,228,.18); border-radius: 0;
-      padding: 8px 0; outline: none;
-      transition: border-color .2s var(--ease-out);
-    }
-    .ct-field textarea { resize: vertical; min-height: 96px; }
-    .ct-field input:focus, .ct-field textarea:focus { border-color: var(--gold); }
-    .ct-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-    .ct-send {
-      justify-self: start; display: inline-flex; align-items: center; gap: 10px;
-      background: transparent; color: var(--gold); cursor: pointer;
-      border: 1px solid var(--gold); padding: 13px 26px;
-      font: 600 11px/1 'Barlow', sans-serif; letter-spacing: .2em; text-transform: uppercase;
-      transition: background .2s var(--ease-out), color .2s var(--ease-out), transform .15s var(--ease-out), opacity .2s;
-    }
-    .ct-send:hover { background: var(--gold); color: var(--bg); }
-    .ct-send:active { transform: scale(.97); }
-    .ct-send[disabled] { opacity: .5; cursor: wait; }
-    .ct-status { font-size: 13px; color: var(--muted); min-height: 1.4em; }
-    .ct-status.ok { color: var(--gold); }
-    .ct-status.err { color: #e88a6b; }
-
     footer {
       padding: 20px 52px; border-top: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: center;
@@ -487,14 +459,6 @@
       <h2 class="cta-big rv d1">VAMOS<br><span>CRIAR</span><br>JUNTOS?</h2>
     </div>
     <div class="ct-right">
-      <form class="ct-form rv" id="ctForm" novalidate>
-        <div class="ct-field"><label for="ctName">Nome</label><input id="ctName" name="nome" type="text" autocomplete="name" required maxlength="120"/></div>
-        <div class="ct-field"><label for="ctEmail">E-mail</label><input id="ctEmail" name="email" type="email" autocomplete="email" required maxlength="160"/></div>
-        <div class="ct-field"><label for="ctMsg">Mensagem</label><textarea id="ctMsg" name="mensagem" required maxlength="4000"></textarea></div>
-        <div class="ct-hp" aria-hidden="true"><label for="ctHp">Não preencha</label><input id="ctHp" name="_honey" type="text" tabindex="-1" autocomplete="off"/></div>
-        <button type="submit" class="ct-send">Enviar mensagem</button>
-        <p class="ct-status" id="ctStatus" role="status" aria-live="polite"></p>
-      </form>
       <div class="ct-item rv"><div class="ct-label">E-mail</div><a href="mailto:contato@bemotion.com.br" class="ct-val">contato@bemotion.com.br</a></div>
       <div class="soc rv d2">
         <a href="https://www.linkedin.com/in/bernardosorio/" class="soc-btn" aria-label="LinkedIn" target="_blank" rel="noopener noreferrer"><svg width="17" height="17" viewBox="0 0 640 640" fill="currentColor"><mask id="linkedinCut"><rect width="640" height="640" fill="#fff"/><g transform="scale(1.25)" fill="#000"><path d="M204.97 197.54h64.69v33.16h.94c9.01-16.16 31.04-33.16 63.89-33.16 68.31 0 80.94 42.51 80.94 97.81v116.92h-67.46l-.01-104.13c0-23.81-.49-54.45-35.08-54.45-35.12 0-40.51 25.91-40.51 52.72v105.86h-67.4V197.54zm-38.23-65.09c0 19.36-15.72 35.08-35.08 35.08-19.37 0-35.09-15.72-35.09-35.08 0-19.37 15.72-35.08 35.09-35.08 19.36 0 35.08 15.71 35.08 35.08zm-70.17 65.09h70.17v214.73H96.57V197.54z"/></g></mask><path mask="url(#linkedinCut)" d="M579.999 0H60C27 0 0 27 0 60v520c0 33 27 60 60 60h519.999c33 0 60-27 60-60V60c0-33-27-60-60-60z"/></svg></a>
@@ -516,32 +480,6 @@ window.addEventListener('scroll',()=>document.getElementById('nav').classList.to
 // ── Reveal ──
 const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on');}),{threshold:.08});
 document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
-
-// ── Contact form (FormSubmit) ──
-// Após ativar, troque o e-mail abaixo pelo código aleatório que a FormSubmit envia.
-const CT_ENDPOINT = 'https://formsubmit.co/ajax/contato@bemotion.com.br';
-const ctForm = document.getElementById('ctForm');
-const ctStatus = document.getElementById('ctStatus');
-ctForm.addEventListener('submit', async e => {
-  e.preventDefault();
-  const setStatus = (msg, cls) => { ctStatus.textContent = msg; ctStatus.className = 'ct-status' + (cls ? ' ' + cls : ''); };
-  if (!ctForm.checkValidity()) { setStatus('Preencha nome, um e-mail válido e a mensagem.', 'err'); return; }
-  if (ctForm._honey.value) return;
-  const btn = ctForm.querySelector('.ct-send');
-  btn.disabled = true; setStatus('Enviando…');
-  try {
-    const data = Object.fromEntries(new FormData(ctForm));
-    data._subject = 'Contato pelo site: ' + data.nome;
-    data._replyto = data.email;
-    data._template = 'table';
-    const r = await fetch(CT_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) });
-    const j = await r.json().catch(() => ({}));
-    if (!r.ok || String(j.success) !== 'true') throw new Error(j.message || 'falha');
-    ctForm.reset(); setStatus('Mensagem enviada. Obrigado! Respondo em breve.', 'ok');
-  } catch (err) {
-    setStatus('Não foi possível enviar agora. Escreva para contato@bemotion.com.br.', 'err');
-  } finally { btn.disabled = false; }
-});
 
 // ── Project modal (lightbox) ──
 const projModal = document.getElementById('projModal');
